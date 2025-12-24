@@ -37,7 +37,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            © 2024 SnippetMotion. All rights reserved.
+            © 2025 SnippetMotion. All rights reserved.
           </p>
         </div>
       </div>

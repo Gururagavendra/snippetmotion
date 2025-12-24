@@ -179,76 +179,78 @@ async function createVideoFromFrames(
   fps: number,
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const firstFrame = frames[0];
-      
-      const canvas = document.createElement("canvas");
-      canvas.width = firstFrame.width;
-      canvas.height = firstFrame.height;
-      const ctx = canvas.getContext("2d");
-      
-      if (!ctx) {
-        reject(new Error("Could not get canvas context"));
-        return;
-      }
-
-      const stream = canvas.captureStream(fps);
-      
-      const mimeTypes = [
-        "video/mp4;codecs=avc1.42E01E",
-        "video/mp4;codecs=h264",
-        "video/mp4",
-        "video/webm;codecs=h264",
-        "video/webm;codecs=vp9",
-        "video/webm"
-      ];
-      
-      let selectedMimeType = "video/webm";
-      for (const mimeType of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(mimeType)) {
-          selectedMimeType = mimeType;
-          break;
-        }
-      }
-      
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: selectedMimeType,
-        videoBitsPerSecond: 12000000,
-      });
-
-      const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const isMP4 = selectedMimeType.includes("mp4");
-        const blob = new Blob(chunks, { type: isMP4 ? "video/mp4" : "video/webm" });
-        resolve(blob);
-      };
-
-      mediaRecorder.start();
-
-      const frameDelay = 1000 / fps;
-      for (let i = 0; i < frames.length; i++) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(frames[i], 0, 0);
-        await new Promise((r) => setTimeout(r, frameDelay));
+  return new Promise((resolve, reject) => {
+    (async () => {
+      try {
+        const firstFrame = frames[0];
         
-        if (onProgress) {
-          onProgress((i + 1) / frames.length);
+        const canvas = document.createElement("canvas");
+        canvas.width = firstFrame.width;
+        canvas.height = firstFrame.height;
+        const ctx = canvas.getContext("2d");
+        
+        if (!ctx) {
+          reject(new Error("Could not get canvas context"));
+          return;
         }
-      }
 
-      await new Promise((r) => setTimeout(r, 500));
-      
-      mediaRecorder.stop();
-    } catch (error) {
-      reject(error);
-    }
+        const stream = canvas.captureStream(fps);
+        
+        const mimeTypes = [
+          "video/mp4;codecs=avc1.42E01E",
+          "video/mp4;codecs=h264",
+          "video/mp4",
+          "video/webm;codecs=h264",
+          "video/webm;codecs=vp9",
+          "video/webm"
+        ];
+        
+        let selectedMimeType = "video/webm";
+        for (const mimeType of mimeTypes) {
+          if (MediaRecorder.isTypeSupported(mimeType)) {
+            selectedMimeType = mimeType;
+            break;
+          }
+        }
+        
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: selectedMimeType,
+          videoBitsPerSecond: 12000000,
+        });
+
+        const chunks: Blob[] = [];
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const isMP4 = selectedMimeType.includes("mp4");
+          const blob = new Blob(chunks, { type: isMP4 ? "video/mp4" : "video/webm" });
+          resolve(blob);
+        };
+
+        mediaRecorder.start();
+
+        const frameDelay = 1000 / fps;
+        for (let i = 0; i < frames.length; i++) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(frames[i], 0, 0);
+          await new Promise((r) => setTimeout(r, frameDelay));
+          
+          if (onProgress) {
+            onProgress((i + 1) / frames.length);
+          }
+        }
+
+        await new Promise((r) => setTimeout(r, 500));
+        
+        mediaRecorder.stop();
+      } catch (error) {
+        reject(error);
+      }
+    })();
   });
 }
 
