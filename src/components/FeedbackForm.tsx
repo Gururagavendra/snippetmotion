@@ -110,7 +110,7 @@ const FeedbackForm = () => {
                   </div>
                   <div>
                     <label htmlFor="email" className="text-sm font-medium text-foreground mb-2 block">
-                      Email <span className="text-muted-foreground text-xs font-normal">(Only for feedback — no marketing spam)</span>
+                      Email <span className="text-muted-foreground text-xs font-normal">(optional)</span>
                     </label>
                     <Input
                       id="email"
@@ -118,11 +118,11 @@ const FeedbackForm = () => {
                       type="text"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="your@email.com (I'll reach out for your feedback!)"
+                      placeholder="your@email.com"
                       className="bg-secondary border-border/50 focus:ring-primary"
                     />
                     <p className="text-xs text-muted-foreground/70 mt-2 leading-relaxed">
-                      I value your suggestions more than your data. If you share your email, I'll only use it to ask for your thoughts on how to make SnippetMotion better for you.
+                      I value your suggestions more than your email🙂. If you share your email, I'll only use it to ask for your thoughts on how to make SnippetMotion better for you.
                     </p>
                     {errors.email && (
                       <p className="text-sm text-destructive mt-1">{errors.email}</p>
@@ -140,7 +140,7 @@ const FeedbackForm = () => {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us what you think..."
+                    placeholder="Tell me, how can i improve this product!..."
                     className="min-h-[120px] bg-secondary border-border/50 resize-none focus:ring-primary"
                   />
                   {errors.message && (
