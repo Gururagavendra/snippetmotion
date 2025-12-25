@@ -10,17 +10,37 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToFeatures = () => {
-    const section = document.getElementById("use-cases");
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
     setIsMobileMenuOpen(false);
+    // Small delay to ensure menu closes before scrolling
+    setTimeout(() => {
+      const section = document.getElementById("use-cases");
+      if (section) {
+        const headerOffset = 80; // Account for fixed header
+        const elementPosition = section.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
   };
 
   const scrollToFeedback = () => {
-    const section = document.getElementById("feedback");
-    if (section) section.scrollIntoView({ behavior: "smooth" });
     setIsMobileMenuOpen(false);
+    // Small delay to ensure menu closes before scrolling
+    setTimeout(() => {
+      const section = document.getElementById("feedback");
+      if (section) {
+        const headerOffset = 80; // Account for fixed header
+        const elementPosition = section.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
   };
 
   const handlePricing = () => {
@@ -107,24 +127,27 @@ const Header = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl"
+              className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl relative z-50"
             >
               <nav className="flex flex-col p-4 gap-2">
                 <button 
                   onClick={scrollToFeatures}
-                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors touch-manipulation"
+                  type="button"
                 >
                   Features
                 </button>
                 <button 
                   onClick={handlePricing}
-                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors touch-manipulation"
+                  type="button"
                 >
                   Pricing
                 </button>
                 <button 
                   onClick={scrollToFeedback}
-                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+                  className="text-left py-3 px-4 text-foreground hover:bg-muted/50 rounded-lg transition-colors touch-manipulation"
+                  type="button"
                 >
                   Feedback
                 </button>
