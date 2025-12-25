@@ -1,4 +1,11 @@
 import { motion } from "framer-motion";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const showcaseItems = [
   {
@@ -155,26 +162,36 @@ const Showcase = () => {
         </motion.div>
       </div>
 
-      {/* Cards Grid */}
+      {/* Swipable Carousel */}
       <div className="relative px-6">
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
-        
-        <div className="flex justify-center gap-6 flex-wrap md:flex-nowrap overflow-x-auto pb-4 scrollbar-hide">
-          {showcaseItems.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex-shrink-0"
-            >
-              <CodePreview item={item} />
-            </motion.div>
-          ))}
-        </div>
+        <Carousel
+          opts={{
+            align: "center",
+            loop: true,
+            dragFree: true,
+          }}
+          className="w-full max-w-7xl mx-auto"
+        >
+          <CarouselContent className="-ml-2 md:-ml-6">
+            {showcaseItems.map((item, index) => (
+              <CarouselItem key={item.id} className="pl-2 md:pl-6 basis-auto">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="flex justify-center"
+                >
+                  <CodePreview item={item} />
+                </motion.div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="flex justify-center gap-4 mt-8">
+            <CarouselPrevious className="static translate-y-0 bg-card/50 border-border/50 hover:bg-card hover:border-primary/50" />
+            <CarouselNext className="static translate-y-0 bg-card/50 border-border/50 hover:bg-card hover:border-primary/50" />
+          </div>
+        </Carousel>
       </div>
 
       {/* Simple stat - only languages supported (honest) */}
