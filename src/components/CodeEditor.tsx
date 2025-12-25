@@ -105,7 +105,7 @@ console.log(greet("Developer"));`);
   };
 
   return (
-    <section id="editor" className="py-16 px-2 sm:px-6">
+    <section id="editor" className="py-16 px-0 sm:px-6">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -117,7 +117,7 @@ console.log(greet("Developer"));`);
           <div className="bg-card rounded-xl overflow-hidden">
             <div className="grid lg:grid-cols-[380px_1fr] gap-0">
               {/* Left: Controls */}
-              <div className="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-border/50">
+              <div className="px-3 py-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-border/50">
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold mb-2 text-gradient">
                     SnippetMotion
@@ -304,7 +304,7 @@ console.log(greet("Developer"));`);
               </div>
 
               {/* Right: Preview */}
-              <div className="p-4 sm:p-8 lg:p-12 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[500px] sm:min-h-[650px] relative overflow-hidden">
+              <div className="px-1 py-4 sm:p-8 lg:p-12 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[500px] sm:min-h-[650px] relative overflow-hidden">
                 {/* Subtle grid pattern */}
                 <div 
                   className="absolute inset-0 opacity-[0.03]"
