@@ -11,7 +11,7 @@ Create beautiful, shareable animated code videos in seconds. Perfect for social 
 
 ---
 
-![SnippetMotion Interface](homepage.png.png)
+![SnippetMotion Interface](homepage.png)
 
 ## Features
 
