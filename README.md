@@ -1,6 +1,6 @@
 # SnippetMotion
 
-> Transform your code snippets into stunning animated videos for TikTok, Instagram, YouTube, and more.
+> Transform your code snippets into stunning animated videos.
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
