@@ -5,7 +5,7 @@
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+
 
 Create beautiful, shareable animated code videos in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
