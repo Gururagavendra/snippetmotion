@@ -1,28 +1,44 @@
 # SnippetMotion
 
-Transform your code snippets into stunning animated videos for TikTok, Instagram, YouTube, and more. Create viral code content in seconds with beautiful typewriter animations, syntax highlighting, and multiple export formats.
+> Transform your code snippets into stunning animated videos for TikTok, Instagram, YouTube, and more.
 
-![SnippetMotion](https://img.shields.io/badge/Status-MVP-green)
-![React](https://img.shields.io/badge/React-18.3-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
+[![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
+
+Create beautiful, shareable animated code videos in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
+
+---
+
+## Table of Contents
+
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [Usage](#-usage)
+- [Examples](#-examples)
+- [Tech Stack](#-tech-stack)
+- [Development](#-development)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## ✨ Features
 
-- **🎬 Fast Video Export** - Optimized export pipeline (2-3x faster than before)
-- **📱 Multiple Aspect Ratios** - Portrait (9:16), Square (1:1), Landscape (16:9)
-- **🎨 Beautiful Themes** - 6 stunning color themes (Cyberpunk, Ocean, Midnight, Sunset, Forest, Neon)
-- **💻 Syntax Highlighting** - Auto-detection for 20+ programming languages
-- **⏸️ Breakpoints** - Add pauses at specific lines for emphasis
-- **📊 Export Formats** - MP4 (video) and GIF support
-- **🎯 Multiple Resolutions** - 720p, 1080p, and 4K options
-- **⚡ Real-time Preview** - See your animation before exporting
-- **🚀 No Login Required** - Start creating immediately
+- 🎬 **Fast Export** - Optimized pipeline exports videos 2-3x faster
+- 📱 **Multiple Formats** - Portrait (9:16), Square (1:1), Landscape (16:9)
+- 🎨 **Beautiful Themes** - 6 stunning color themes
+- 💻 **Smart Highlighting** - Auto-detection for 20+ programming languages
+- ⏸️ **Breakpoints** - Add pauses at specific lines for emphasis
+- 📊 **Export Options** - MP4 video and GIF formats
+- 🎯 **High Quality** - 720p, 1080p, and 4K resolution support
+- ⚡ **Real-time Preview** - See your animation before exporting
+- 🚀 **No Login** - Start creating immediately
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm (or use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- Node.js 18+ and npm
 
 ### Installation
 
@@ -38,99 +54,88 @@ npm install
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`
+Visit `http://localhost:5173` to start creating.
 
-### Build for Production
+### Build
 
 ```bash
-# Build the project
+# Build for production
 npm run build
 
 # Preview production build
 npm run preview
 ```
 
+## 📖 Usage
+
+1. **Paste your code** into the editor
+2. **Select language** (or use auto-detection)
+3. **Choose a theme** from 6 beautiful options
+4. **Set duration** - Short (1.5s), Medium (4s), or Long (8s)
+5. **Add breakpoints** (optional) - Click line numbers to pause
+6. **Preview** your animation
+7. **Export** as MP4 or GIF in your preferred resolution
+
+## 🎯 Examples
+
+### Social Media Content
+Create engaging code snippets for TikTok, Instagram Reels, and YouTube Shorts.
+
+### GitHub READMEs
+Add animated GIFs to showcase your projects and make them stand out.
+
+### Tutorials
+Include code animations in YouTube videos and documentation.
+
+### Portfolio
+Showcase your coding skills with beautiful, professional visuals.
+
 ## 🛠️ Tech Stack
 
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 18 + TypeScript
 - **Build Tool**: Vite 5
-- **Styling**: Tailwind CSS + shadcn/ui components
+- **Styling**: Tailwind CSS + shadcn/ui
 - **Animations**: Framer Motion
 - **Syntax Highlighting**: Highlight.js
 - **Video Export**: html2canvas + MediaRecorder API
 - **GIF Export**: gif.js
 
-## 📖 Usage
-
-1. **Paste Your Code** - Enter your code snippet in the editor
-2. **Choose Language** - Select or auto-detect the programming language
-3. **Pick a Theme** - Choose from 6 beautiful color themes
-4. **Set Duration** - Short (~1.5s), Medium (~4s), or Long (~8s)
-5. **Add Breakpoints** (Optional) - Click line numbers to add pauses
-6. **Preview** - Watch your animation before exporting
-7. **Export** - Download as MP4 or GIF in your preferred resolution
-
-## 🎯 Use Cases
-
-- **Social Media Content** - Create engaging code snippets for TikTok, Instagram Reels
-- **GitHub READMEs** - Add animated GIFs to showcase your projects
-- **YouTube Videos** - Include code animations in tutorials
-- **Documentation** - Make your docs more engaging with animated examples
-- **Portfolio** - Showcase your coding skills with beautiful visuals
-
-## ⚡ Performance Optimizations
-
-The export pipeline has been optimized for speed:
-
-- **Reduced FPS** - 30 FPS for videos (smooth and fast)
-- **Optimized Canvas Capture** - Tuned html2canvas settings for 30% faster frame capture
-- **Eliminated Real-time Delays** - Rendering phase now completes in ~1s instead of ~12s
-- **GPU-Accelerated UI** - Smooth spinner animations even during heavy processing
-
-**Result**: Export times reduced from 45-60s to 15-25s (2-3x faster)
-
-## 📁 Project Structure
-
-```
-snippetmotion-main/
-├── src/
-│   ├── components/        # React components
-│   │   ├── CodeEditor.tsx    # Main editor with export functionality
-│   │   ├── CodePreview.tsx   # Animated code preview
-│   │   └── ui/              # shadcn/ui components
-│   ├── hooks/
-│   │   └── useVideoExport.ts # Video/GIF export logic
-│   ├── contexts/
-│   │   └── PricingContext.tsx
-│   ├── pages/
-│   │   └── Index.tsx        # Main landing page
-│   └── lib/
-│       └── utils.ts
-├── public/               # Static assets
-└── package.json
-```
-
 ## 🔧 Development
 
 ### Available Scripts
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run build:dev` - Build in development mode
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
+
+### Project Structure
+
+```
+snippetmotion-main/
+├── src/
+│   ├── components/      # React components
+│   ├── hooks/          # Custom hooks
+│   ├── contexts/       # React contexts
+│   ├── pages/          # Page components
+│   └── lib/            # Utilities
+├── public/             # Static assets
+└── package.json
+```
 
 ### Key Files
 
-- **Export Logic**: `src/hooks/useVideoExport.ts` - Contains all video/GIF export optimizations
-- **Editor Component**: `src/components/CodeEditor.tsx` - Main UI for code editing and export
-- **Preview Component**: `src/components/CodePreview.tsx` - Typewriter animation logic
+- `src/hooks/useVideoExport.ts` - Video/GIF export logic
+- `src/components/CodeEditor.tsx` - Main editor component
+- `src/components/CodePreview.tsx` - Animation preview
 
 ## 🎨 Customization
 
-### Adding New Themes
+### Adding Themes
 
-Edit `src/components/CodePreview.tsx` and add your theme to the `themeGradients` object:
+Edit `src/components/CodePreview.tsx`:
 
 ```typescript
 const themeGradients: Record<string, { bg: string; card: string }> = {
@@ -141,13 +146,9 @@ const themeGradients: Record<string, { bg: string; card: string }> = {
 };
 ```
 
-### Adjusting Export Settings
+### Export Settings
 
-Modify `src/hooks/useVideoExport.ts`:
-
-- Change default FPS: `fps = 30` (line 12)
-- Adjust canvas scale: `scale: 1.5` (line 22)
-- Modify bitrate: `videoBitsPerSecond: 8000000` (line 263)
+Modify `src/hooks/useVideoExport.ts` to adjust FPS, scale, and bitrate.
 
 ## 🤝 Contributing
 
@@ -155,15 +156,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
-This project is private and proprietary.
+This project is proprietary and private.
 
 ## 🙏 Acknowledgments
 
-- [shadcn/ui](https://ui.shadcn.com/) for beautiful components
-- [Highlight.js](https://highlightjs.org/) for syntax highlighting
-- [html2canvas](https://html2canvas.hertzen.com/) for canvas capture
-- [gif.js](https://jnordberg.github.io/gif.js/) for GIF generation
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful components
+- [Highlight.js](https://highlightjs.org/) - Syntax highlighting
+- [html2canvas](https://html2canvas.hertzen.com/) - Canvas capture
+- [gif.js](https://jnordberg.github.io/gif.js/) - GIF generation
 
 ---
 
-**Made with ❤️ for developers who want to share their code beautifully**
+**Made with ❤️ for developers**
