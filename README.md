@@ -5,7 +5,7 @@
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
+[![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 
 Create beautiful, shareable animated code videos in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
@@ -13,32 +13,32 @@ Create beautiful, shareable animated code videos in seconds. Perfect for social 
 
 ## Table of Contents
 
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [Usage](#-usage)
-- [Examples](#-examples)
-- [Tech Stack](#-tech-stack)
-- [Development](#-development)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Tech Stack](#tech-stack)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-## ✨ Features
+## Features
 
-- 🎬 **Fast Export** - Optimized pipeline exports videos 2-3x faster
-- 📱 **Multiple Formats** - Portrait (9:16), Square (1:1), Landscape (16:9)
-- 🎨 **Beautiful Themes** - 6 stunning color themes
-- 💻 **Smart Highlighting** - Auto-detection for 20+ programming languages
-- ⏸️ **Breakpoints** - Add pauses at specific lines for emphasis
-- 📊 **Export Options** - MP4 video and GIF formats
-- 🎯 **High Quality** - 720p, 1080p, and 4K resolution support
-- ⚡ **Real-time Preview** - See your animation before exporting
-- 🚀 **No Login** - Start creating immediately
+- **Fast Export** - Optimized pipeline exports videos 2-3x faster
+- **Multiple Formats** - Portrait (9:16), Square (1:1), Landscape (16:9)
+- **Beautiful Themes** - 6 stunning color themes
+- **Smart Highlighting** - Auto-detection for 20+ programming languages
+- **Breakpoints** - Add pauses at specific lines for emphasis
+- **Export Options** - MP4 video and GIF formats
+- **High Quality** - 720p, 1080p, and 4K resolution support
+- **Real-time Preview** - See your animation before exporting
+- **No Login** - Start creating immediately
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- [Bun](https://bun.sh/) (latest version)
 
 ### Installation
 
@@ -48,25 +48,25 @@ git clone <YOUR_GIT_URL>
 cd snippetmotion-main
 
 # Install dependencies
-npm install
+bun install
 
 # Start development server
-npm run dev
+bun run dev
 ```
 
-Visit `http://localhost:5173` to start creating.
+Visit `http://localhost:8080` to start creating.
 
 ### Build
 
 ```bash
 # Build for production
-npm run build
+bun run build
 
 # Preview production build
-npm run preview
+bun run preview
 ```
 
-## 📖 Usage
+## Usage
 
 1. **Paste your code** into the editor
 2. **Select language** (or use auto-detection)
@@ -76,7 +76,7 @@ npm run preview
 6. **Preview** your animation
 7. **Export** as MP4 or GIF in your preferred resolution
 
-## 🎯 Examples
+## Examples
 
 ### Social Media Content
 Create engaging code snippets for TikTok, Instagram Reels, and YouTube Shorts.
@@ -90,8 +90,9 @@ Include code animations in YouTube videos and documentation.
 ### Portfolio
 Showcase your coding skills with beautiful, professional visuals.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
+- **Runtime**: Bun
 - **Framework**: React 18 + TypeScript
 - **Build Tool**: Vite 5
 - **Styling**: Tailwind CSS + shadcn/ui
@@ -100,38 +101,18 @@ Showcase your coding skills with beautiful, professional visuals.
 - **Video Export**: html2canvas + MediaRecorder API
 - **GIF Export**: gif.js
 
-## 🔧 Development
+## Development
 
 ### Available Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run lint     # Run ESLint
+bun run dev      # Start development server
+bun run build    # Build for production
+bun run preview  # Preview production build
+bun run lint     # Run ESLint
 ```
 
-### Project Structure
-
-```
-snippetmotion-main/
-├── src/
-│   ├── components/      # React components
-│   ├── hooks/          # Custom hooks
-│   ├── contexts/       # React contexts
-│   ├── pages/          # Page components
-│   └── lib/            # Utilities
-├── public/             # Static assets
-└── package.json
-```
-
-### Key Files
-
-- `src/hooks/useVideoExport.ts` - Video/GIF export logic
-- `src/components/CodeEditor.tsx` - Main editor component
-- `src/components/CodePreview.tsx` - Animation preview
-
-## 🎨 Customization
+## Customization
 
 ### Adding Themes
 
@@ -150,15 +131,15 @@ const themeGradients: Record<string, { bg: string; card: string }> = {
 
 Modify `src/hooks/useVideoExport.ts` to adjust FPS, scale, and bitrate.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
+## License
 
-This project is proprietary and private.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [shadcn/ui](https://ui.shadcn.com/) - Beautiful components
 - [Highlight.js](https://highlightjs.org/) - Syntax highlighting
@@ -167,4 +148,4 @@ This project is proprietary and private.
 
 ---
 
-**Made with ❤️ for developers**
+**Made with love for developers**
