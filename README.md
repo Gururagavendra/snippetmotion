@@ -11,16 +11,6 @@ Create beautiful, shareable animated code videos in seconds. Perfect for social 
 
 ---
 
-## Table of Contents
-
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Tech Stack](#tech-stack)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -76,41 +66,16 @@ bun run preview
 6. **Preview** your animation
 7. **Export** as MP4 or GIF in your preferred resolution
 
-## Examples
+## Use Cases
 
-### Social Media Content
-Create engaging code snippets for TikTok, Instagram Reels, and YouTube Shorts.
+SnippetMotion is perfect for showcasing code in an engaging, visual way:
 
-### GitHub READMEs
-Add animated GIFs to showcase your projects and make them stand out.
+- **Social Media** - Create eye-catching code snippets for TikTok, Instagram Reels, YouTube Shorts, Twitter, and LinkedIn
+- **GitHub READMEs** - Add animated GIFs to showcase projects, APIs, and tutorials
+- **Educational Content** - Enhance YouTube tutorials, online courses, blog posts, and workshops with animated code examples
+- **Portfolios & Presentations** - Showcase coding skills in developer portfolios, job applications, and conference talks
+- **Marketing** - Create engaging product demos, feature announcements, and technical content for developer communities
 
-### Tutorials
-Include code animations in YouTube videos and documentation.
-
-### Portfolio
-Showcase your coding skills with beautiful, professional visuals.
-
-## Tech Stack
-
-- **Runtime**: Bun
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite 5
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Animations**: Framer Motion
-- **Syntax Highlighting**: Highlight.js
-- **Video Export**: html2canvas + MediaRecorder API
-- **GIF Export**: gif.js
-
-## Development
-
-### Available Scripts
-
-```bash
-bun run dev      # Start development server
-bun run build    # Build for production
-bun run preview  # Preview production build
-bun run lint     # Run ESLint
-```
 
 ## Customization
 
