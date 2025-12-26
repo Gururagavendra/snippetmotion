@@ -57,15 +57,6 @@ bun run build
 bun run preview
 ```
 
-## Usage
-
-1. **Paste your code** into the editor
-2. **Select language** (or use auto-detection)
-3. **Choose a theme** from 6 beautiful options
-4. **Set duration** - Short (1.5s), Medium (4s), or Long (8s)
-5. **Add breakpoints** (optional) - Click line numbers to pause
-6. **Preview** your animation
-7. **Export** as MP4 or GIF in your preferred resolution
 
 ## Use Cases
 
