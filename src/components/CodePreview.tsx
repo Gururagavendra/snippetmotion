@@ -182,7 +182,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
                 <motion.span
                   animate={{ opacity: [1, 0] }}
                   transition={{ repeat: Infinity, duration: 0.5 }}
-                  className="inline-block w-[2px] h-[14px] bg-white ml-[1px] align-middle"
+                  className="inline w-[2px] bg-white ml-[1px] border-l-2 border-white"
                 />
               )}
             </pre>
@@ -198,7 +198,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ repeat: Infinity, duration: 0.5 }}
-                className="inline-block w-[2px] h-[14px] bg-white ml-[1px] align-middle"
+                className="inline w-[2px] bg-white ml-[1px] border-l-2 border-white"
               />
             )}
           </pre>

@@ -34,9 +34,9 @@ const themes = [
 ];
 
 const durations = [
-  { value: "long", label: "Long (~8s)", delay: 80 },
-  { value: "medium", label: "Medium (~4s)", delay: 40 },
-  { value: "short", label: "Short (~1.5s)", delay: 15 },
+  { value: "long", label: "Long (8s)", targetMs: 8000 },
+  { value: "medium", label: "Medium (4s)", targetMs: 4000 },
+  { value: "short", label: "Short (1.5s)", targetMs: 1500 },
 ];
 
 const aspectRatios = [
@@ -119,7 +119,31 @@ console.log(greet("Developer"));`);
   
   const previewRef = useRef<CodePreviewHandle>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ fps: 30 });
+  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ 
+    fps: 30,
+    resolution: exportResolution 
+  });
+
+  // Get target duration from selected duration setting
+  const targetDuration = useMemo(() => 
+    durations.find(d => d.value === duration)?.targetMs || 4000, 
+    [duration]
+  );
+  
+  // Calculate typing delay to fit animation within target duration
+  // Formula: typingDelay = (targetDuration - breakpointPauses - endBuffer) / code.length
+  const typingDelay = useMemo(() => {
+    const endBuffer = 500; // End delay in CodePreview
+    const breakpointPauseDuration = pausedLineIndices.length * pauseDuration;
+    const availableTimeForTyping = targetDuration - breakpointPauseDuration - endBuffer;
+    
+    // Ensure minimum delay of 5ms and maximum of 200ms per character
+    const calculatedDelay = Math.max(5, Math.min(200, availableTimeForTyping / Math.max(1, code.length)));
+    return calculatedDelay;
+  }, [targetDuration, pausedLineIndices.length, pauseDuration, code.length]);
+  
+  // The actual animation duration is now the target duration
+  const actualAnimationDuration = targetDuration;
 
   const handlePreview = async () => {
     if (previewRef.current) {
@@ -143,7 +167,7 @@ console.log(greet("Developer"));`);
           await previewRef.current.startAnimation();
         }
       },
-      12500
+      actualAnimationDuration
     );
     setIsAnimating(false);
   };
@@ -468,10 +492,10 @@ console.log(greet("Developer"));`);
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
-                          {progress < 50 && "🎬 Capturing frames..."}
-                          {progress >= 50 && progress < 85 && "✨ Recording your magic..."}
-                          {progress >= 85 && progress < 95 && "🎯 Encoding video..."}
-                          {progress >= 95 && `🚀 Finalizing ${exportFormat.toUpperCase()}...`}
+                          {progress < 50 && "Capturing frames..."}
+                          {progress >= 50 && progress < 85 && "Recording your magic..."}
+                          {progress >= 85 && progress < 95 && "Encoding video..."}
+                          {progress >= 95 && `Finalizing ${exportFormat.toUpperCase()}...`}
                         </span>
                         <span className="text-primary font-medium">{Math.round(progress)}%</span>
                       </div>
@@ -566,7 +590,7 @@ console.log(greet("Developer"));`);
                           theme={theme}
                           language={language}
                           aspectRatio="portrait"
-                          typingDelay={durations.find(d => d.value === duration)?.delay || 40}
+                          typingDelay={typingDelay}
                           isAnimating={isAnimating}
                           showWatermark={!isPro && isExporting}
                           pausedLineIndices={pausedLineIndices}
@@ -583,7 +607,7 @@ console.log(greet("Developer"));`);
                           theme={theme}
                           language={language}
                           aspectRatio={aspectRatio}
-                          typingDelay={durations.find(d => d.value === duration)?.delay || 40}
+                          typingDelay={typingDelay}
                           isAnimating={isAnimating}
                           showWatermark={!isPro && isExporting}
                           pausedLineIndices={pausedLineIndices}
