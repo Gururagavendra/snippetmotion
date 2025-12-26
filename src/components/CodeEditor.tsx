@@ -32,9 +32,9 @@ const themes = [
 ];
 
 const durations = [
-  { value: "long", label: "Long (~8s)", durationMs: 8000 },
-  { value: "medium", label: "Medium (~4s)", durationMs: 4000 },
-  { value: "short", label: "Short (~1.5s)", durationMs: 1500 },
+  { value: "long", label: "Long (~8s)", delay: 80 },
+  { value: "medium", label: "Medium (~4s)", delay: 40 },
+  { value: "short", label: "Short (~1.5s)", delay: 15 },
 ];
 
 const languages = [
@@ -75,7 +75,7 @@ console.log(greet("Developer"));`);
   
   const previewRef = useRef<CodePreviewHandle>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ fps: 30 });
+  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ fps: 60 });
 
   const handlePreview = async () => {
     if (previewRef.current) {
@@ -90,13 +90,6 @@ console.log(greet("Developer"));`);
     
     setIsAnimating(true);
     
-    // Calculate typing delay based on target video duration
-    const selectedDuration = durations.find(d => d.value === duration);
-    const targetDurationMs = selectedDuration?.durationMs || 4000; // Default to medium
-    const holdTime = 500; // Hold final frame for 500ms
-    const animationTime = targetDurationMs - holdTime;
-    const typingDelay = Math.max(10, Math.floor(animationTime / code.length));
-    
     const exportFn = exportFormat === "gif" ? exportGif : exportVideo;
     
     await exportFn(
@@ -106,7 +99,7 @@ console.log(greet("Developer"));`);
           await previewRef.current.startAnimation();
         }
       },
-      targetDurationMs
+      12500
     );
     setIsAnimating(false);
   };
@@ -338,13 +331,7 @@ console.log(greet("Developer"));`);
                         ref={previewRef}
                         code={code}
                         theme={theme}
-                        typingDelay={(() => {
-                          const selectedDuration = durations.find(d => d.value === duration);
-                          const targetDurationMs = selectedDuration?.durationMs || 4000;
-                          const holdTime = 500;
-                          const animationTime = targetDurationMs - holdTime;
-                          return Math.max(10, Math.floor(animationTime / code.length));
-                        })()}
+                        typingDelay={durations.find(d => d.value === duration)?.delay || 40}
                         isAnimating={isAnimating}
                         showWatermark={!isPro && isExporting}
                       />
