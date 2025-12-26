@@ -205,4 +205,132 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* GPU-accelerated smooth spinner that won't stutter during heavy main thread work */
+  .spinner-smooth {
+    animation: spinner-rotate 1s linear infinite;
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU layer */
+  }
+
+  @keyframes spinner-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* Highlight.js Syntax Highlighting - Custom Dark Theme */
+.hljs {
+  color: #e6e6e6;
+  background: transparent;
+}
+
+/* Keywords: function, const, let, var, return, if, else, etc. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #ff79c6;
+  font-weight: 500;
+}
+
+/* Strings */
+.hljs-string,
+.hljs-attr,
+.hljs-template-variable,
+.hljs-selector-attr {
+  color: #50fa7b;
+}
+
+/* Numbers */
+.hljs-number,
+.hljs-literal {
+  color: #bd93f9;
+}
+
+/* Functions */
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: #8be9fd;
+  font-weight: 500;
+}
+
+/* Variables and parameters */
+.hljs-variable,
+.hljs-params {
+  color: #ffb86c;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote {
+  color: #6272a4;
+  font-style: italic;
+}
+
+/* Types, classes */
+.hljs-type,
+.hljs-class,
+.hljs-selector-class {
+  color: #f1fa8c;
+}
+
+/* Tags (HTML) */
+.hljs-tag {
+  color: #ff79c6;
+}
+
+/* Attributes */
+.hljs-attribute {
+  color: #50fa7b;
+}
+
+/* Punctuation and operators */
+.hljs-punctuation,
+.hljs-operator {
+  color: #e6e6e6;
+}
+
+/* Meta/preprocessor */
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  color: #ff79c6;
+}
+
+/* Regex */
+.hljs-regexp {
+  color: #ff5555;
+}
+
+/* Symbol */
+.hljs-symbol,
+.hljs-bullet {
+  color: #ffb86c;
+}
+
+/* Addition (diff) */
+.hljs-addition {
+  color: #50fa7b;
+  background-color: rgba(80, 250, 123, 0.1);
+}
+
+/* Deletion (diff) */
+.hljs-deletion {
+  color: #ff5555;
+  background-color: rgba(255, 85, 85, 0.1);
+}
+
+/* Template literals */
+.hljs-subst {
+  color: #f8f8f2;
+}
+
+/* Property */
+.hljs-property {
+  color: #66d9ef;
 }

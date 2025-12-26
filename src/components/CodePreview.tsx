@@ -1,5 +1,6 @@
-import { forwardRef, useEffect, useState, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useState, useImperativeHandle, useMemo } from "react";
 import { motion } from "framer-motion";
+import hljs from "highlight.js";
 
 export interface CodePreviewHandle {
   startAnimation: () => Promise<void>;
@@ -9,9 +10,13 @@ export interface CodePreviewHandle {
 interface CodePreviewProps {
   code: string;
   theme: string;
+  language?: string;
+  aspectRatio?: "portrait" | "square" | "landscape";
   typingDelay?: number;
   isAnimating?: boolean;
   showWatermark?: boolean;
+  pausedLineIndices?: number[];
+  pauseDuration?: number;
 }
 
 const themeGradients: Record<string, { bg: string; card: string }> = {
@@ -41,12 +46,61 @@ const themeGradients: Record<string, { bg: string; card: string }> = {
   },
 };
 
+// Map our language values to highlight.js language names
+const languageMap: Record<string, string> = {
+  javascript: "javascript",
+  typescript: "typescript",
+  python: "python",
+  css: "css",
+  html: "xml",
+  java: "java",
+  cpp: "cpp",
+  csharp: "csharp",
+  go: "go",
+  rust: "rust",
+  swift: "swift",
+  kotlin: "kotlin",
+  php: "php",
+  sql: "sql",
+  json: "json",
+  yaml: "yaml",
+  bash: "bash",
+  markdown: "markdown",
+};
+
 const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
-  ({ code, theme, typingDelay = 40, isAnimating = false, showWatermark = false }, ref) => {
+  ({ code, theme, language = "javascript", aspectRatio = "portrait", typingDelay = 40, isAnimating = false, showWatermark = false, pausedLineIndices = [], pauseDuration = 1500 }, ref) => {
     const [displayedChars, setDisplayedChars] = useState(code.length);
     const [animationComplete, setAnimationComplete] = useState(true);
 
     const themeStyles = themeGradients[theme] || themeGradients.midnight;
+    
+    // Get highlighted HTML for the displayed code
+    const highlightedCode = useMemo(() => {
+      const displayedCode = code.slice(0, displayedChars);
+      
+      try {
+        // Use auto-detection if "auto" is selected
+        if (language === "auto") {
+          return hljs.highlightAuto(displayedCode).value;
+        }
+        
+        const hljsLang = languageMap[language] || "plaintext";
+        const result = hljs.highlight(displayedCode, { language: hljsLang, ignoreIllegals: true });
+        return result.value;
+      } catch {
+        // Fallback to auto-detection if language isn't registered
+        try {
+          const result = hljs.highlightAuto(displayedCode);
+          return result.value;
+        } catch {
+          return displayedCode;
+        }
+      }
+    }, [code, displayedChars, language]);
+
+    // Sleep utility
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     useImperativeHandle(ref, () => ({
       startAnimation: async () => {
@@ -54,20 +108,31 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
         setAnimationComplete(false);
         
         const totalChars = code.length;
+        let currentChar = 0;
+        let currentLineIndex = 0;
 
-        return new Promise<void>((resolve) => {
-          let currentChar = 0;
-          const interval = setInterval(() => {
-            currentChar++;
-            setDisplayedChars(currentChar);
-            
-            if (currentChar >= totalChars) {
-              clearInterval(interval);
-              setAnimationComplete(true);
-              setTimeout(resolve, 500);
+        // Use async loop instead of setInterval to allow for variable delays (pauses)
+        while (currentChar < totalChars) {
+          const char = code[currentChar];
+          currentChar++;
+          setDisplayedChars(currentChar);
+
+          // Check if we just typed a newline
+          if (char === '\n') {
+            // We just completed line at currentLineIndex
+            if (pausedLineIndices.includes(currentLineIndex)) {
+              // Pause the animation for the configured duration
+              await sleep(pauseDuration);
             }
-          }, typingDelay);
-        });
+            currentLineIndex++;
+          }
+
+          // Wait for the normal typing delay
+          await sleep(typingDelay);
+        }
+
+        setAnimationComplete(true);
+        await sleep(500);
       },
       resetAnimation: () => {
         setDisplayedChars(code.length);
@@ -82,30 +147,37 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
       }
     }, [code, isAnimating]);
 
-    const displayedCode = code.slice(0, displayedChars);
     const showCursor = !animationComplete;
+
+    // Show code card with traffic lights only for portrait (phone mockup)
+    // For square/landscape, MacWindowMockup already has traffic lights
+    const showCodeCard = aspectRatio === "portrait";
 
     return (
       <div
-        className="w-full h-full flex items-center justify-center p-4 relative"
+        className={`w-full h-full flex ${showCodeCard ? 'items-center justify-center p-4' : 'items-start p-6'} relative`}
         style={{ background: themeStyles.bg }}
       >
-        <div
-          className="w-full rounded-xl p-4 border border-white/10 shadow-2xl backdrop-blur-sm"
-          style={{ background: themeStyles.card }}
-        >
-          {/* Window controls */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/30"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/30"></div>
-            <span className="text-[10px] text-white/40 ml-2 font-mono">snippet.js</span>
-          </div>
+        {showCodeCard ? (
+          /* Code card with traffic lights - for portrait/phone mockup */
+          <div
+            className="w-full rounded-xl p-4 border border-white/10 shadow-2xl backdrop-blur-sm"
+            style={{ background: themeStyles.card }}
+          >
+            {/* Window controls - traffic lights */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/30"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/30"></div>
+              <span className="text-[10px] text-white/40 ml-2 font-mono">snippet.js</span>
+            </div>
 
-          {/* Code content with typewriter */}
-          <pre className="text-[11px] font-mono leading-relaxed text-white/90 whitespace-pre-wrap break-words min-h-[100px]">
-            <code>
-              {displayedCode}
+            {/* Code content with typewriter and syntax highlighting */}
+            <pre className="text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words min-h-[100px]">
+              <code 
+                className="hljs"
+                dangerouslySetInnerHTML={{ __html: highlightedCode }}
+              />
               {showCursor && (
                 <motion.span
                   animate={{ opacity: [1, 0] }}
@@ -113,9 +185,24 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
                   className="inline-block w-[2px] h-[14px] bg-white ml-[1px] align-middle"
                 />
               )}
-            </code>
+            </pre>
+          </div>
+        ) : (
+          /* Code directly on background - for square/landscape (MacWindowMockup has its own chrome) */
+          <pre className="text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words">
+            <code 
+              className="hljs"
+              dangerouslySetInnerHTML={{ __html: highlightedCode }}
+            />
+            {showCursor && (
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ repeat: Infinity, duration: 0.5 }}
+                className="inline-block w-[2px] h-[14px] bg-white ml-[1px] align-middle"
+              />
+            )}
           </pre>
-        </div>
+        )}
 
         {/* Watermark - only shown in exported video for free users */}
         {showWatermark && (

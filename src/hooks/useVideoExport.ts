@@ -9,7 +9,7 @@ interface UseVideoExportOptions {
 }
 
 export const useVideoExport = (options: UseVideoExportOptions = {}) => {
-  const { fps = 60, quality = 1.0 } = options;
+  const { fps = 30, quality = 1.0 } = options;
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exportPhase, setExportPhase] = useState<string>("");
@@ -19,10 +19,12 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
     try {
       const canvas = await html2canvas(element, {
         backgroundColor: null,
-        scale: 2,
+        scale: 1.5, // Reduced from 2 for faster capture while maintaining quality
         logging: false,
-        useCORS: true,
-        allowTaint: true,
+        useCORS: false, // Disabled for speed - we don't need external images
+        allowTaint: false, // Disabled for speed
+        imageTimeout: 0, // Skip waiting for images
+        removeContainer: true, // Clean up immediately
       });
       return canvas;
     } catch (error) {
@@ -46,33 +48,56 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         const totalFrames = Math.ceil((durationMs / 1000) * fps);
         const frameInterval = durationMs / totalFrames;
         let frameCount = 0;
+        let isCapturing = true;
+        let lastCaptureTime = performance.now();
 
+        // Start animation
         const animationPromise = animationFn();
 
-        const captureInterval = setInterval(async () => {
-          const frame = await captureFrame(previewElement);
-          if (frame) {
-            framesRef.current.push(frame);
-            frameCount++;
-            setProgress(Math.min((frameCount / totalFrames) * 60, 59));
+        // Use requestAnimationFrame for smoother, more reliable frame capture
+        const captureLoop = async () => {
+          if (!isCapturing) return;
+          
+          const now = performance.now();
+          const elapsed = now - lastCaptureTime;
+          
+          // Only capture if enough time has passed for next frame
+          if (elapsed >= frameInterval) {
+            const frame = await captureFrame(previewElement);
+            if (frame) {
+              framesRef.current.push(frame);
+              frameCount++;
+              // Frame capture is ~85% of total work, scale progress accordingly
+              setProgress(Math.min((frameCount / totalFrames) * 85, 84));
+            }
+            lastCaptureTime = now - (elapsed % frameInterval); // Adjust for timing drift
           }
-        }, frameInterval);
+          
+          if (isCapturing) {
+            requestAnimationFrame(captureLoop);
+          }
+        };
 
+        // Start capture loop
+        requestAnimationFrame(captureLoop);
+
+        // Wait for animation to complete
         await animationPromise;
-        clearInterval(captureInterval);
+        isCapturing = false;
 
         setExportPhase("finalizing");
-        setProgress(65);
+        setProgress(88);
         const finalFrame = await captureFrame(previewElement);
         if (finalFrame) {
           framesRef.current.push(finalFrame);
         }
 
         setExportPhase("rendering");
-        setProgress(70);
+        setProgress(92);
         
+        // Rendering is fast now, only 8% of progress
         const videoBlob = await createVideoFromFrames(framesRef.current, fps, (renderProgress) => {
-          setProgress(70 + (renderProgress * 30));
+          setProgress(92 + (renderProgress * 8));
         });
 
         setProgress(100);
@@ -112,38 +137,61 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
       framesRef.current = [];
 
       try {
-        // Lower FPS for GIF (20fps is good for file size)
-        const gifFps = 20;
+        // Lower FPS for GIF (15fps for smaller file size, still smooth)
+        const gifFps = 15;
         const totalFrames = Math.ceil((durationMs / 1000) * gifFps);
         const frameInterval = durationMs / totalFrames;
         let frameCount = 0;
+        let isCapturing = true;
+        let lastCaptureTime = performance.now();
 
+        // Start animation
         const animationPromise = animationFn();
 
-        const captureInterval = setInterval(async () => {
-          const frame = await captureFrame(previewElement);
-          if (frame) {
-            framesRef.current.push(frame);
-            frameCount++;
-            setProgress(Math.min((frameCount / totalFrames) * 60, 59));
+        // Use requestAnimationFrame for smoother, more reliable frame capture
+        const captureLoop = async () => {
+          if (!isCapturing) return;
+          
+          const now = performance.now();
+          const elapsed = now - lastCaptureTime;
+          
+          // Only capture if enough time has passed for next frame
+          if (elapsed >= frameInterval) {
+            const frame = await captureFrame(previewElement);
+            if (frame) {
+              framesRef.current.push(frame);
+              frameCount++;
+              // Frame capture is ~70% of total work for GIF (rendering takes longer)
+              setProgress(Math.min((frameCount / totalFrames) * 70, 69));
+            }
+            lastCaptureTime = now - (elapsed % frameInterval); // Adjust for timing drift
           }
-        }, frameInterval);
+          
+          if (isCapturing) {
+            requestAnimationFrame(captureLoop);
+          }
+        };
 
+        // Start capture loop
+        requestAnimationFrame(captureLoop);
+
+        // Wait for animation to complete
         await animationPromise;
-        clearInterval(captureInterval);
+        isCapturing = false;
 
         setExportPhase("finalizing");
-        setProgress(65);
+        setProgress(72);
         const finalFrame = await captureFrame(previewElement);
         if (finalFrame) {
           framesRef.current.push(finalFrame);
         }
 
         setExportPhase("rendering");
-        setProgress(70);
+        setProgress(75);
 
+        // GIF rendering takes longer, give it 25% of progress
         const gifBlob = await createGifFromFrames(framesRef.current, gifFps, (renderProgress) => {
-          setProgress(70 + (renderProgress * 30));
+          setProgress(75 + (renderProgress * 25));
         });
 
         setProgress(100);
@@ -194,7 +242,9 @@ async function createVideoFromFrames(
           return;
         }
 
-        const stream = canvas.captureStream(fps);
+        // Use captureStream with 0 to manually request frames
+        const stream = canvas.captureStream(0);
+        const videoTrack = stream.getVideoTracks()[0];
         
         const mimeTypes = [
           "video/mp4;codecs=avc1.42E01E",
@@ -215,7 +265,7 @@ async function createVideoFromFrames(
         
         const mediaRecorder = new MediaRecorder(stream, {
           mimeType: selectedMimeType,
-          videoBitsPerSecond: 12000000,
+          videoBitsPerSecond: 8000000, // Slightly reduced for faster encoding
         });
 
         const chunks: Blob[] = [];
@@ -231,20 +281,37 @@ async function createVideoFromFrames(
           resolve(blob);
         };
 
-        mediaRecorder.start();
+        // Request data more frequently for smoother encoding
+        mediaRecorder.start(100);
 
-        const frameDelay = 1000 / fps;
+        // Process frames immediately without real-time delays
+        // Each frame is held for the duration it should appear (1000/fps ms)
+        const frameDurationMs = 1000 / fps;
+        let currentTime = 0;
+        
         for (let i = 0; i < frames.length; i++) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(frames[i], 0, 0);
-          await new Promise((r) => setTimeout(r, frameDelay));
+          
+          // Request a new frame from the canvas stream
+          if (videoTrack && 'requestFrame' in videoTrack) {
+            (videoTrack as any).requestFrame();
+          }
+          
+          // Small yield to allow encoder to process (much faster than real-time)
+          if (i % 10 === 0) {
+            await new Promise((r) => setTimeout(r, 1));
+          }
+          
+          currentTime += frameDurationMs;
           
           if (onProgress) {
             onProgress((i + 1) / frames.length);
           }
         }
 
-        await new Promise((r) => setTimeout(r, 500));
+        // Brief pause to ensure last frames are encoded
+        await new Promise((r) => setTimeout(r, 100));
         
         mediaRecorder.stop();
       } catch (error) {
