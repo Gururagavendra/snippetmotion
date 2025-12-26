@@ -1,7 +1,5 @@
 # SnippetMotion
 
-> Transform your code snippets into stunning animated videos.
-
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
