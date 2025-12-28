@@ -8,7 +8,7 @@
 Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
 ---
-
+![SnippetMotion Demo](snippet-motion-1766907321348.gif)
 ![SnippetMotion Interface](homepage.png)
 
 ## Features
@@ -31,8 +31,6 @@ Create beautiful, shareable animated code videos or gifs in seconds. Perfect for
 
 ### Installation
 
-
-![SnippetMotion Demo](snippet-motion-1766907321348.gif)
 
 ```bash
 # Clone the repository
