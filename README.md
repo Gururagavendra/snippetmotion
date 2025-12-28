@@ -33,7 +33,7 @@ Create beautiful, shareable animated code videos or gifs in seconds. Perfect for
 
 ```bash
 # Clone the repository
-git clone <YOUR_GIT_URL>
+git clone <GIT_URL>
 cd snippetmotion-main
 
 # Install dependencies
