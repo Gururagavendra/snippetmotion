@@ -111,18 +111,9 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
             allElements.forEach((el) => {
               const htmlEl = el as HTMLElement;
               htmlEl.style.textRendering = 'geometricPrecision';
-
-              // CRITICAL: Preserve line-height for consistent text rendering during typing animation
-              // This fixes the "half height" text issue in exported videos/GIFs
-              const computedStyle = window.getComputedStyle(htmlEl);
-              if (computedStyle.lineHeight && computedStyle.lineHeight !== 'normal') {
-                htmlEl.style.lineHeight = computedStyle.lineHeight;
-              } else {
-                // Force consistent line height for code text (equivalent to leading-relaxed)
-                htmlEl.style.lineHeight = '1.625';
-              }
-
+              
               // CRITICAL: Ensure background gradients render at maximum quality
+              const computedStyle = window.getComputedStyle(htmlEl);
               if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
                 // Force high-quality gradient rendering
                 htmlEl.style.imageRendering = 'auto';
@@ -134,7 +125,7 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
                 htmlEl.style.transform = 'translateZ(0)';
                 htmlEl.style.willChange = 'background-image';
               }
-
+              
               // Also check inline styles
               if (htmlEl.style.background || htmlEl.style.backgroundImage) {
                 htmlEl.style.imageRendering = 'auto';
@@ -142,17 +133,6 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
                 htmlEl.style.backgroundRepeat = 'no-repeat';
                 htmlEl.style.transform = 'translateZ(0)';
               }
-            });
-
-            // Additional fix: Force line-height on the main container and pre/code elements
-            const preElements = clonedElement.querySelectorAll('pre, code, .hljs');
-            preElements.forEach((el) => {
-              const htmlEl = el as HTMLElement;
-              // Ensure consistent line height for all text elements
-              htmlEl.style.lineHeight = '1.625'; // Equivalent to leading-relaxed
-              htmlEl.style.textRendering = 'geometricPrecision';
-              (htmlEl.style as any).webkitFontSmoothing = 'antialiased';
-              (htmlEl.style as any).MozOsxFontSmoothing = 'grayscale';
             });
             
             // Force repaint to ensure gradients render at full quality
@@ -201,9 +181,6 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
           
           // Only capture if enough time has passed for next frame
           if (elapsed >= frameInterval) {
-            // Small delay to ensure DOM updates are complete (fixes line-height issues)
-            await new Promise(resolve => setTimeout(resolve, 16)); // ~1 frame at 60fps
-
             // Capture at maximum resolution for crystal clear quality
             const frame = await captureFrame(previewElement);
             if (frame) {

@@ -8,8 +8,23 @@
 Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
 ---
-![SnippetMotion Demo](snippet-motion-1766907321348.gif)
-![SnippetMotion Interface](homepage.png)
+<div align="center">
+  <div style="margin-bottom: 20px;">
+    <img src="snippet-motion-1766907321348.gif" alt="SnippetMotion Desktop Demo" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <p style="text-align: center; margin-top: 8px; font-size: 14px; color: #666;">Desktop Demo</p>
+  </div>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
+    <div style="flex: 0 0 70%; max-width: 70%;">
+      <img src="homepage.png" alt="SnippetMotion Interface" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <p style="text-align: center; margin-top: 8px; font-size: 14px; color: #666;">Interface</p>
+    </div>
+    <div style="flex: 0 0 30%; max-width: 30%;">
+      <img src="snippet-motion-1766909078234.gif" alt="SnippetMotion Mobile Demo" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <p style="text-align: center; margin-top: 8px; font-size: 14px; color: #666;">Mobile Demo</p>
+    </div>
+  </div>
+</div>
 
 ## Features
 
