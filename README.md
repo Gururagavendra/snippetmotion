@@ -7,7 +7,8 @@
 
 Inspired by carbon, Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
-Check out the live dem: [snippetmotion.vercel.app](https://snippetmotion.vercel.app/)
+Check out the live demo: [snippetmotion.vercel.app](https://snippetmotion.vercel.app/)
+
 ---
 <div align="center">
   <img src="snippet-motion-1766907321348.gif" alt="SnippetMotion Desktop Demo" width="100%">
