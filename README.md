@@ -26,7 +26,7 @@ Inspired from carbon, Create beautiful, shareable animated code videos or gifs i
   </table>
 </div>
 
-checkout the online hosted version: [snippetmotion.vercel.app](snippetmotion.vercel.app)
+checkout the online hosted version: [snippetmotion.vercel.app](https://snippetmotion.vercel.app/)
 
 ## Features
 
