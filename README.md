@@ -5,8 +5,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
 
 
-Inspired from carbon, Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
+Inspired by carbon, Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
+Check out the live dem: [snippetmotion.vercel.app](https://snippetmotion.vercel.app/)
 ---
 <div align="center">
   <img src="snippet-motion-1766907321348.gif" alt="SnippetMotion Desktop Demo" width="100%">
@@ -26,7 +27,6 @@ Inspired from carbon, Create beautiful, shareable animated code videos or gifs i
   </table>
 </div>
 
-checkout the online hosted version: [snippetmotion.vercel.app](https://snippetmotion.vercel.app/)
 
 ## Features
 
