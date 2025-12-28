@@ -155,7 +155,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
 
     return (
       <div
-        className={`w-full h-full flex ${showCodeCard ? 'items-center justify-center p-4' : 'items-start p-6'} relative`}
+        className={`w-full h-full flex ${showCodeCard ? 'items-center justify-center p-4' : 'items-start p-3 sm:p-6'} relative`}
         style={{ background: themeStyles.bg }}
       >
         {showCodeCard ? (
@@ -189,7 +189,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
           </div>
         ) : (
           /* Code directly on background - for square/landscape (MacWindowMockup has its own chrome) */
-          <pre className="text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words">
+          <pre className="text-[10px] sm:text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words">
             <code 
               className="hljs"
               dangerouslySetInnerHTML={{ __html: highlightedCode }}

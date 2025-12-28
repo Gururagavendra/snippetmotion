@@ -6,18 +6,22 @@ interface MacWindowMockupProps {
 }
 
 const MacWindowMockup = ({ children, aspectRatio }: MacWindowMockupProps) => {
-  // Dimensions optimized for each platform
-  const dimensions = {
+  // Max dimensions optimized for each platform
+  const maxDimensions = {
     square: { width: 400, height: 400 },      // Instagram/Twitter
     landscape: { width: 560, height: 315 },   // YouTube/LinkedIn (16:9)
   };
 
-  const { width, height } = dimensions[aspectRatio];
+  const { width: maxWidth } = maxDimensions[aspectRatio];
+  const aspectRatioValue = aspectRatio === "square" ? "1 / 1" : "16 / 9";
 
   return (
     <div
-      className="relative mx-auto flex-shrink-0 rounded-lg overflow-hidden shadow-2xl"
-      style={{ width: `${width}px`, height: `${height}px` }}
+      className="relative mx-auto flex-shrink-0 rounded-lg overflow-hidden shadow-2xl w-full"
+      style={{ 
+        maxWidth: `${maxWidth}px`,
+        aspectRatio: aspectRatioValue,
+      }}
     >
       {/* macOS Window Frame */}
       <div className="relative w-full h-full bg-[#1e1e1e] flex flex-col">

@@ -21,12 +21,15 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
         >
-          Turn Code into{" "}
-          <span className="text-gradient">Viral Shorts</span>
+          Stop posting
           <br />
-          in 10 Seconds
+          static screenshots.
+          <br />
+          <span className="text-gradient">Create cinematic code</span>
+          <br />
+          that stop the scroll.
         </motion.h1>
 
         <motion.p
@@ -35,8 +38,7 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12"
         >
-          The fastest way to create stunning code animations for TikTok, 
-          Instagram, and YouTube. No video editing skills required.
+          The fastest way to create stunning code animations. No video editing skills required.
         </motion.p>
 
         <motion.div

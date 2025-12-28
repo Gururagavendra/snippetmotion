@@ -549,7 +549,7 @@ console.log(greet("Developer"));`);
               </div>
 
               {/* Right: Preview */}
-              <div className="px-1 py-4 sm:p-8 lg:p-12 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[500px] sm:min-h-[650px] relative overflow-hidden">
+              <div className="px-3 py-4 sm:p-8 lg:p-12 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[400px] sm:min-h-[500px] lg:min-h-[650px] relative overflow-hidden">
                 {/* Subtle grid pattern */}
                 <div 
                   className="absolute inset-0 opacity-[0.03]"
@@ -568,7 +568,7 @@ console.log(greet("Developer"));`);
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="relative z-10 py-4"
+                  className="relative z-10 py-4 w-full max-w-full flex items-center justify-center"
                 >
                   {isLineLimitExceeded ? (
                     <div className="flex flex-col items-center justify-center text-center p-8 rounded-2xl border border-red-500/20 bg-red-500/5 min-w-[280px] min-h-[400px]">
