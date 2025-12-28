@@ -26,6 +26,8 @@ Create beautiful, shareable animated code videos or gifs in seconds. Perfect for
   </table>
 </div>
 
+checkout the online hosted version: snippetmotion.vercel.app
+
 ## Features
 
 - **Fast Export** - Optimized pipeline exports videos 2-3x faster
