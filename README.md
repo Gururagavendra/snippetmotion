@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6.svg)](https://www.typescriptlang.org/)
 
 
-Create beautiful, shareable animated code videos in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
+Create beautiful, shareable animated code videos or gifs in seconds. Perfect for social media, GitHub READMEs, tutorials, and more.
 
 ---
 
