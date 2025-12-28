@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Download, Loader2, Play, Clock, Film, ImageIcon, Circle, Timer } from "lucide-react";
+import { Download, Loader2, Play, Film, ImageIcon, Circle } from "lucide-react";
 import PhoneMockup from "@/components/PhoneMockup";
 import MacWindowMockup from "@/components/MacWindowMockup";
 import CodePreview, { CodePreviewHandle } from "@/components/CodePreview";
@@ -40,9 +40,8 @@ const durations = [
 ];
 
 const aspectRatios = [
-  { value: "portrait", label: "Portrait", icon: "📱", ratio: "9:16", description: "TikTok/Reels" },
-  { value: "square", label: "Square", icon: "⬜", ratio: "1:1", description: "Instagram/Twitter" },
-  { value: "landscape", label: "Landscape", icon: "💻", ratio: "16:9", description: "YouTube/LinkedIn" },
+  { value: "portrait", label: "Portrait", ratio: "9:16", description: "TikTok/Reels" },
+  { value: "landscape", label: "Landscape", ratio: "16:9", description: "YouTube/LinkedIn" },
 ] as const;
 
 type AspectRatio = typeof aspectRatios[number]["value"];
@@ -119,6 +118,7 @@ console.log(greet("Developer"));`);
   
   const previewRef = useRef<CodePreviewHandle>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ 
     fps: 30,
     resolution: exportResolution 
@@ -174,7 +174,7 @@ console.log(greet("Developer"));`);
 
   return (
     <section id="editor" className="py-16 px-0 sm:px-6">
-      <div className="container mx-auto">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -183,21 +183,21 @@ console.log(greet("Developer"));`);
           className="rounded-2xl glow-border animate-glow-pulse bg-card p-1"
         >
           <div className="bg-card rounded-xl overflow-hidden">
-            <div className="grid lg:grid-cols-[480px_1fr] gap-0">
+            <div className="grid lg:grid-cols-[600px_1fr] gap-0">
               {/* Left: Controls */}
-              <div className="px-3 py-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-border/50">
+              <div className="px-3 py-6 lg:px-10 lg:py-10 border-b lg:border-b-0 lg:border-r border-border/50">
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-2 text-gradient">
+                  <h2 className="text-2xl lg:text-3xl font-semibold mb-2 text-gradient">
                     SnippetMotion
                   </h2>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base lg:text-lg text-muted-foreground">
                     Transform your code into stunning videos
                   </p>
                 </div>
 
                 <div className="space-y-5">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">
+                    <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
                       Code
                       {pausedLineIndices.length > 0 && (
                         <span className="ml-2 text-xs text-amber-400">
@@ -206,100 +206,106 @@ console.log(greet("Developer"));`);
                       )}
                     </label>
                     {/* Custom Code Editor with Gutter */}
-                    <div className="flex rounded-md border border-border/50 bg-secondary overflow-hidden min-h-[220px]">
-                      {/* Gutter - Line Numbers */}
-                      <div className="flex flex-col bg-muted/30 border-r border-border/30 select-none shrink-0 pt-2">
-                        {lines.map((_, lineIndex) => (
-                          <TooltipProvider key={lineIndex} delayDuration={300}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  type="button"
-                                  onClick={() => !isAnimating && !isExporting && toggleBreakpoint(lineIndex)}
-                                  disabled={isAnimating || isExporting}
-                                  className={`
-                                    flex items-center justify-end gap-1 px-2 py-0 h-[22px] text-xs font-mono
-                                    transition-colors cursor-pointer
-                                    ${pausedLineIndices.includes(lineIndex) 
-                                      ? 'text-amber-400 bg-amber-400/10' 
-                                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    <div className="relative rounded-md border border-border/50 bg-secondary overflow-hidden">
+                      {/* Scrollable container */}
+                      <div className="overflow-y-auto overflow-x-hidden max-h-[320px] min-h-[220px] code-editor-scroll">
+                        <div className="flex min-h-full">
+                          {/* Gutter - Line Numbers */}
+                          <div className="flex flex-col bg-muted/30 border-r border-border/30 select-none shrink-0 sticky left-0 z-10 pt-2 pb-2">
+                            {lines.map((_, lineIndex) => (
+                              <TooltipProvider key={lineIndex} delayDuration={300}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      type="button"
+                                      onClick={() => !isAnimating && !isExporting && toggleBreakpoint(lineIndex)}
+                                      disabled={isAnimating || isExporting}
+                                      className={`
+                                        flex items-center justify-end gap-1 px-2 py-0 h-[24px] text-xs font-mono
+                                        transition-colors cursor-pointer shrink-0
+                                        ${pausedLineIndices.includes(lineIndex) 
+                                          ? 'text-amber-400 bg-amber-400/10' 
+                                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                        }
+                                        ${isAnimating || isExporting ? 'cursor-not-allowed opacity-50' : ''}
+                                      `}
+                                    >
+                                      {pausedLineIndices.includes(lineIndex) && (
+                                        <Circle className="w-2 h-2 fill-amber-400 text-amber-400" />
+                                      )}
+                                      <span className="w-5 lg:w-6 text-right text-xs lg:text-sm">{lineIndex + 1}</span>
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="text-xs">
+                                    {pausedLineIndices.includes(lineIndex) 
+                                      ? 'Click to remove breakpoint' 
+                                      : 'Click to add breakpoint'
                                     }
-                                    ${isAnimating || isExporting ? 'cursor-not-allowed opacity-50' : ''}
-                                  `}
-                                >
-                                  {pausedLineIndices.includes(lineIndex) && (
-                                    <Circle className="w-2 h-2 fill-amber-400 text-amber-400" />
-                                  )}
-                                  <span className="w-4 text-right">{lineIndex + 1}</span>
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="text-xs">
-                                {pausedLineIndices.includes(lineIndex) 
-                                  ? 'Click to remove breakpoint' 
-                                  : 'Click to add breakpoint'
-                                }
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        ))}
-                      </div>
-                      {/* Code Input Area with Syntax Highlighting */}
-                      <div className="flex-1 relative min-h-[220px]">
-                        {/* Highlighted code layer (behind) */}
-                        <pre 
-                          className="absolute inset-0 font-mono text-sm p-2 leading-[22px] pointer-events-none overflow-hidden whitespace-pre-wrap break-words m-0"
-                          aria-hidden="true"
-                        >
-                          <code 
-                            className="hljs"
-                            dangerouslySetInnerHTML={{ 
-                              __html: (() => {
-                                try {
-                                  if (language === "auto") {
-                                    return hljs.highlightAuto(code || " ").value;
-                                  }
-                                  const langMap: Record<string, string> = {
-                                    javascript: "javascript", typescript: "typescript", python: "python",
-                                    css: "css", html: "xml", java: "java", cpp: "cpp", csharp: "csharp",
-                                    go: "go", rust: "rust", swift: "swift", kotlin: "kotlin", php: "php",
-                                    sql: "sql", json: "json", yaml: "yaml", bash: "bash", markdown: "markdown"
-                                  };
-                                  const hljsLang = langMap[language] || "plaintext";
-                                  return hljs.highlight(code || " ", { language: hljsLang, ignoreIllegals: true }).value;
-                                } catch {
-                                  return code || " ";
-                                }
-                              })()
-                            }}
-                          />
-                        </pre>
-                        {/* Transparent textarea (on top, captures input) */}
-                        <textarea
-                          value={code}
-                          onChange={(e) => setCode(e.target.value)}
-                          className="absolute inset-0 w-full h-full font-mono text-sm bg-transparent resize-none focus:outline-none p-2 leading-[22px] text-transparent caret-white"
-                          placeholder="Paste your code here..."
-                          disabled={isAnimating || isExporting}
-                          spellCheck={false}
-                          style={{ caretColor: 'white' }}
-                        />
-                        {/* Line counter */}
-                        <div 
-                          className={`absolute bottom-2 right-2 text-xs font-mono px-2 py-0.5 rounded ${
-                            isLineLimitExceeded 
-                              ? 'bg-red-500/20 text-red-400' 
-                              : 'bg-muted/50 text-muted-foreground'
-                          }`}
-                        >
-                          {lineCount}/{MAX_LINES} lines
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ))}
+                          </div>
+                          {/* Code Input Area with Syntax Highlighting */}
+                          <div className="flex-1 relative min-w-0">
+                            {/* Highlighted code layer (behind) */}
+                            <pre 
+                              className="font-mono text-sm lg:text-base p-2 lg:p-3 leading-[24px] whitespace-pre-wrap break-words m-0"
+                              aria-hidden="true"
+                            >
+                              <code 
+                                className="hljs"
+                                dangerouslySetInnerHTML={{ 
+                                  __html: (() => {
+                                    try {
+                                      if (language === "auto") {
+                                        return hljs.highlightAuto(code || " ").value;
+                                      }
+                                      const langMap: Record<string, string> = {
+                                        javascript: "javascript", typescript: "typescript", python: "python",
+                                        css: "css", html: "xml", java: "java", cpp: "cpp", csharp: "csharp",
+                                        go: "go", rust: "rust", swift: "swift", kotlin: "kotlin", php: "php",
+                                        sql: "sql", json: "json", yaml: "yaml", bash: "bash", markdown: "markdown"
+                                      };
+                                      const hljsLang = langMap[language] || "plaintext";
+                                      return hljs.highlight(code || " ", { language: hljsLang, ignoreIllegals: true }).value;
+                                    } catch {
+                                      return code || " ";
+                                    }
+                                  })()
+                                }}
+                              />
+                            </pre>
+                            {/* Transparent textarea (on top, captures input) */}
+                            <textarea
+                              ref={textareaRef}
+                              value={code}
+                              onChange={(e) => setCode(e.target.value)}
+                              className="absolute inset-0 w-full h-full font-mono text-sm lg:text-base bg-transparent resize-none focus:outline-none p-2 lg:p-3 leading-[24px] text-transparent caret-white"
+                              placeholder="Paste your code here..."
+                              disabled={isAnimating || isExporting}
+                              spellCheck={false}
+                              style={{ caretColor: 'white' }}
+                            />
+                          </div>
                         </div>
+                      </div>
+                      {/* Line counter - fixed at bottom right */}
+                      <div 
+                        className={`absolute bottom-2 right-3 text-xs lg:text-sm font-mono px-2 py-0.5 rounded z-20 ${
+                          isLineLimitExceeded 
+                            ? 'bg-red-500/90 text-white' 
+                            : 'bg-background/80 text-muted-foreground backdrop-blur-sm'
+                        }`}
+                      >
+                        {lineCount}/{MAX_LINES} lines
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
                         Language
                       </label>
                       <Select value={language} onValueChange={setLanguage} disabled={isAnimating || isExporting}>
@@ -317,7 +323,7 @@ console.log(greet("Developer"));`);
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
                         Theme
                       </label>
                       <Select value={theme} onValueChange={setTheme} disabled={isAnimating || isExporting}>
@@ -335,8 +341,7 @@ console.log(greet("Developer"));`);
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5" />
+                      <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
                         Duration
                       </label>
                       <Select value={duration} onValueChange={setDuration} disabled={isAnimating || isExporting}>
@@ -354,7 +359,7 @@ console.log(greet("Developer"));`);
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
                         Aspect Ratio
                       </label>
                       <Select value={aspectRatio} onValueChange={(v) => setAspectRatio(v as AspectRatio)} disabled={isAnimating || isExporting}>
@@ -364,10 +369,7 @@ console.log(greet("Developer"));`);
                         <SelectContent>
                           {aspectRatios.map((ar) => (
                             <SelectItem key={ar.value} value={ar.value}>
-                              <span className="flex items-center gap-2">
-                                <span>{ar.icon}</span>
-                                <span>{ar.ratio}</span>
-                              </span>
+                              {ar.ratio}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -377,10 +379,9 @@ console.log(greet("Developer"));`);
 
                   {/* Breakpoint Pause Time Slider */}
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block flex items-center gap-1.5">
-                      <Timer className="w-3.5 h-3.5" />
-                      Breakpoint Pause
-                      <span className="ml-auto text-xs font-normal text-muted-foreground">
+                    <label className="text-base lg:text-lg font-medium text-foreground mb-2 block flex items-center justify-between">
+                      <span>Breakpoint Pause</span>
+                      <span className="text-sm lg:text-base font-normal text-muted-foreground">
                         {(pauseDuration / 1000).toFixed(1)}s
                       </span>
                     </label>
@@ -406,7 +407,7 @@ console.log(greet("Developer"));`);
 
                   {/* Export Settings */}
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-foreground block">
+                    <label className="text-base lg:text-lg font-medium text-foreground block">
                       Export Settings
                     </label>
                     
@@ -419,7 +420,7 @@ console.log(greet("Developer"));`);
                               type="button"
                               onClick={() => setExportFormat("mp4")}
                               disabled={isAnimating || isExporting}
-                              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-medium transition-all ${
+                              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm lg:text-base font-medium transition-all ${
                                 exportFormat === "mp4"
                                   ? "bg-primary text-primary-foreground"
                                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -442,7 +443,7 @@ console.log(greet("Developer"));`);
                               type="button"
                               onClick={() => setExportFormat("gif")}
                               disabled={isAnimating || isExporting}
-                              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-medium transition-all ${
+                              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm lg:text-base font-medium transition-all ${
                                 exportFormat === "gif"
                                   ? "bg-primary text-primary-foreground"
                                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -469,7 +470,7 @@ console.log(greet("Developer"));`);
                                 type="button"
                                 onClick={() => setExportResolution(res.value as ExportResolution)}
                                 disabled={isAnimating || isExporting}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-sm font-medium transition-all ${
+                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-sm lg:text-base font-medium transition-all ${
                                   exportResolution === res.value
                                     ? "bg-primary/80 text-primary-foreground"
                                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -490,7 +491,7 @@ console.log(greet("Developer"));`);
 
                   {isExporting && (
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm lg:text-base">
                         <span className="text-muted-foreground">
                           {progress < 50 && "Capturing frames..."}
                           {progress >= 50 && progress < 85 && "Recording your magic..."}
@@ -506,7 +507,7 @@ console.log(greet("Developer"));`);
                   {/* Line limit warning */}
                   {isLineLimitExceeded && (
                     <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2">
-                      <span className="text-red-400 text-sm font-medium">
+                      <span className="text-red-400 text-sm lg:text-base font-medium">
                         ⚠️ Too long for video (Max {MAX_LINES} lines)
                       </span>
                     </div>
@@ -517,28 +518,28 @@ console.log(greet("Developer"));`);
                       onClick={handlePreview}
                       disabled={isAnimating || isExporting || isLineLimitExceeded}
                       variant="outline"
-                      className="h-12 border-border/50"
+                      className="h-12 lg:h-14 border-border/50 text-sm lg:text-base"
                     >
-                      <Play className="w-4 h-4 mr-2" />
+                      <Play className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
                       Preview
                     </Button>
                     
                     <Button 
                       onClick={handleExport}
                       disabled={isAnimating || isExporting || isLineLimitExceeded}
-                      className="bg-gradient-to-r from-primary to-accent text-background font-semibold h-12 btn-glow hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-primary to-accent text-background font-semibold h-12 lg:h-14 text-sm lg:text-base btn-glow hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isExporting ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 spinner-smooth" />
+                          <Loader2 className="w-4 h-4 lg:w-5 lg:h-5 mr-2 spinner-smooth" />
                           Exporting...
                         </>
                       ) : (
                         <>
                           {exportFormat === "gif" ? (
-                            <ImageIcon className="w-4 h-4 mr-2" />
+                            <ImageIcon className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
                           ) : (
-                            <Film className="w-4 h-4 mr-2" />
+                            <Film className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
                           )}
                           Export {exportFormat.toUpperCase()}
                         </>
@@ -549,7 +550,7 @@ console.log(greet("Developer"));`);
               </div>
 
               {/* Right: Preview */}
-              <div className="px-3 py-4 sm:p-8 lg:p-12 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[400px] sm:min-h-[500px] lg:min-h-[650px] relative overflow-hidden">
+              <div className="px-3 py-4 sm:p-8 lg:p-16 bg-gradient-to-br from-background via-background/95 to-muted/20 flex items-center justify-center min-h-[400px] sm:min-h-[500px] lg:min-h-[700px] relative overflow-hidden">
                 {/* Subtle grid pattern */}
                 <div 
                   className="absolute inset-0 opacity-[0.03]"

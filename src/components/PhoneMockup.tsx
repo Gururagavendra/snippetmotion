@@ -6,7 +6,7 @@ interface PhoneMockupProps {
 
 const PhoneMockup = ({ children }: PhoneMockupProps) => {
   return (
-    <div className="relative w-[280px] h-[580px] mx-auto flex-shrink-0">
+    <div className="relative w-[280px] h-[580px] lg:w-[340px] lg:h-[700px] mx-auto flex-shrink-0">
       {/* Phone Frame - Black bezel like iPhone */}
       <div className="relative w-full h-full bg-[#1c1c1e] rounded-[44px] p-[4px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6),0_30px_60px_-30px_rgba(0,0,0,0.5)]">
         {/* Glass reflection overlay */}

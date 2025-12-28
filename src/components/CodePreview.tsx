@@ -166,14 +166,14 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
           >
             {/* Window controls - traffic lights */}
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/30"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/30"></div>
-              <span className="text-[10px] text-white/40 ml-2 font-mono">snippet.js</span>
+              <div className="w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-red-500 shadow-lg shadow-red-500/30"></div>
+              <div className="w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30"></div>
+              <div className="w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-green-500 shadow-lg shadow-green-500/30"></div>
+              <span className="text-[10px] lg:text-xs text-white/40 ml-2 font-mono">snippet.js</span>
             </div>
 
             {/* Code content with typewriter and syntax highlighting */}
-            <pre className="text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words min-h-[100px]">
+            <pre className="text-[11px] lg:text-sm font-mono leading-relaxed whitespace-pre-wrap break-words min-h-[100px]">
               <code 
                 className="hljs"
                 dangerouslySetInnerHTML={{ __html: highlightedCode }}
@@ -182,14 +182,14 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
                 <motion.span
                   animate={{ opacity: [1, 0] }}
                   transition={{ repeat: Infinity, duration: 0.5 }}
-                  className="inline w-[2px] bg-white ml-[1px] border-l-2 border-white"
+                  className="inline-block w-[2px] h-[1.2em] bg-white ml-[1px] align-text-bottom translate-y-[0.1em]"
                 />
               )}
             </pre>
           </div>
         ) : (
           /* Code directly on background - for square/landscape (MacWindowMockup has its own chrome) */
-          <pre className="text-[10px] sm:text-[11px] font-mono leading-relaxed whitespace-pre-wrap break-words">
+          <pre className="text-[10px] sm:text-[11px] lg:text-sm font-mono leading-relaxed whitespace-pre-wrap break-words">
             <code 
               className="hljs"
               dangerouslySetInnerHTML={{ __html: highlightedCode }}
@@ -198,7 +198,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ repeat: Infinity, duration: 0.5 }}
-                className="inline w-[2px] bg-white ml-[1px] border-l-2 border-white"
+                className="inline-block w-[2px] h-[1.2em] bg-white ml-[1px] align-text-bottom translate-y-[0.1em]"
               />
             )}
           </pre>
@@ -207,7 +207,7 @@ const CodePreview = forwardRef<CodePreviewHandle, CodePreviewProps>(
         {/* Watermark - only shown in exported video for free users */}
         {showWatermark && (
           <div className="absolute bottom-4 right-4 px-2 py-1 rounded bg-black/50 backdrop-blur-sm">
-            <span className="text-[9px] text-white/60 font-medium">Made with SnippetMotion</span>
+            <span className="text-[9px] lg:text-xs text-white/60 font-medium">Made with SnippetMotion</span>
           </div>
         )}
       </div>

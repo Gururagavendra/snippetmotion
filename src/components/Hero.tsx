@@ -23,13 +23,9 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
         >
-          Stop posting
+          Stop posting static screenshots.
           <br />
-          static screenshots.
-          <br />
-          <span className="text-gradient">Create cinematic code</span>
-          <br />
-          that stop the scroll.
+          <span className="text-gradient">Create cinematic code</span> animations that stop the scroll.
         </motion.h1>
 
         <motion.p

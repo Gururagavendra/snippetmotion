@@ -16,53 +16,98 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
   const [exportPhase, setExportPhase] = useState<string>("");
   const framesRef = useRef<HTMLCanvasElement[]>([]);
 
-  // Calculate scale based on resolution for high quality
+  // Calculate scale based on resolution for MAXIMUM POSSIBLE quality
+  // Extreme supersampling - captures at massive resolution then scales down
+  // This produces the sharpest possible output matching browser rendering
   const getScaleForResolution = useCallback((res: "720p" | "1080p" | "4k"): number => {
     switch (res) {
       case "720p":
-        return 2.0; // 720p: 2x scale
+        return 5.0; // 720p: 5x scale 
       case "1080p":
-        return 3.0; // 1080p: 3x scale for crisp quality
+        return 6.0; // 1080p: 6x scale
       case "4k":
-        return 4.0; // 4K: 4x scale for maximum quality
+        return 8.0; // 4K: 8x scale for absolute maximum quality
       default:
-        return 2.0;
+        return 5.0;
     }
   }, []);
 
-  const captureFrame = useCallback(async (element: HTMLElement, targetWidth?: number, targetHeight?: number): Promise<HTMLCanvasElement | null> => {
+  const captureFrame = useCallback(async (element: HTMLElement, _targetWidth?: number, _targetHeight?: number): Promise<HTMLCanvasElement | null> => {
     try {
-      // If target dimensions provided, calculate exact scale to avoid scaling artifacts
-      let scale: number;
-      if (targetWidth && targetHeight) {
-        const elementWidth = element.offsetWidth || element.clientWidth;
-        const elementHeight = element.offsetHeight || element.clientHeight;
-        // Calculate scale to match target resolution exactly
-        const scaleX = targetWidth / elementWidth;
-        const scaleY = targetHeight / elementHeight;
-        scale = Math.min(scaleX, scaleY); // Use smaller to fit
-      } else {
-        scale = getScaleForResolution(resolution);
-      }
+      // ALWAYS use maximum scale for absolute best quality (extreme supersampling)
+      const scale = getScaleForResolution(resolution);
+      
+      // Force a repaint to ensure gradients are fully rendered before capture
+      void element.offsetHeight;
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise(resolve => requestAnimationFrame(resolve));
       
       const canvas = await html2canvas(element, {
         backgroundColor: null,
         scale: scale,
         logging: false,
-        useCORS: false,
-        allowTaint: false,
+        useCORS: true,
+        allowTaint: true,
         imageTimeout: 0,
         removeContainer: true,
-        // Prevent rendering artifacts
         foreignObjectRendering: false,
-        // Better gradient rendering
-        onclone: (clonedDoc) => {
-          // Force GPU acceleration for gradients
-          const clonedElement = clonedDoc.querySelector('[data-html2canvas-ignore="false"]') || 
-                               clonedDoc.body.querySelector('div');
+        // Maximum quality settings for html2canvas
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+        // Enhanced clone processing for maximum fidelity - especially gradients
+        onclone: (clonedDoc, clonedElement) => {
+          // Apply maximum quality rendering to the cloned element
           if (clonedElement) {
-            (clonedElement as HTMLElement).style.transform = 'translateZ(0)';
-            (clonedElement as HTMLElement).style.willChange = 'transform';
+            // Force GPU-accelerated rendering for smooth gradients
+            clonedElement.style.transform = 'translateZ(0)';
+            clonedElement.style.backfaceVisibility = 'hidden';
+            clonedElement.style.willChange = 'transform, background';
+            
+            // CRITICAL: Force high-quality gradient rendering
+            // Use smooth rendering for gradients (not crisp-edges which is for pixel art)
+            clonedElement.style.imageRendering = 'high-quality';
+            (clonedElement.style as any).imageRendering = 'auto';
+            
+            // Maximum text quality
+            clonedElement.style.textRendering = 'geometricPrecision';
+            (clonedElement.style as any).webkitFontSmoothing = 'antialiased';
+            (clonedElement.style as any).MozOsxFontSmoothing = 'grayscale';
+            
+            // Force high DPI rendering for background gradients
+            clonedElement.style.backgroundSize = '100% 100%';
+            clonedElement.style.backgroundRepeat = 'no-repeat';
+            
+            // Apply to all child elements for consistent quality
+            const allElements = clonedElement.querySelectorAll('*');
+            allElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              htmlEl.style.textRendering = 'geometricPrecision';
+              
+              // CRITICAL: Ensure background gradients render at maximum quality
+              const computedStyle = window.getComputedStyle(htmlEl);
+              if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
+                // Force high-quality gradient rendering
+                htmlEl.style.imageRendering = 'auto';
+                htmlEl.style.backgroundSize = '100% 100%';
+                htmlEl.style.backgroundRepeat = 'no-repeat';
+                htmlEl.style.backgroundPosition = 'center';
+                htmlEl.style.backgroundAttachment = 'fixed';
+                // Force GPU acceleration for gradients
+                htmlEl.style.transform = 'translateZ(0)';
+                htmlEl.style.willChange = 'background-image';
+              }
+              
+              // Also check inline styles
+              if (htmlEl.style.background || htmlEl.style.backgroundImage) {
+                htmlEl.style.imageRendering = 'auto';
+                htmlEl.style.backgroundSize = '100% 100%';
+                htmlEl.style.backgroundRepeat = 'no-repeat';
+                htmlEl.style.transform = 'translateZ(0)';
+              }
+            });
+            
+            // Force repaint to ensure gradients render at full quality
+            void clonedElement.offsetHeight;
           }
         },
       });
@@ -85,29 +130,6 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
       framesRef.current = [];
 
       try {
-        // Get target resolution dimensions
-        const targetResolutions = {
-          "720p": { width: 1280, height: 720 },
-          "1080p": { width: 1920, height: 1080 },
-          "4k": { width: 3840, height: 2160 },
-        };
-        const targetRes = targetResolutions[resolution];
-        
-        // Calculate aspect ratio to determine final dimensions
-        const elementAspect = previewElement.offsetWidth / previewElement.offsetHeight;
-        const targetAspect = targetRes.width / targetRes.height;
-        
-        let captureWidth = targetRes.width;
-        let captureHeight = targetRes.height;
-        
-        if (elementAspect > targetAspect) {
-          // Element is wider - fit to width
-          captureHeight = targetRes.width / elementAspect;
-        } else {
-          // Element is taller - fit to height
-          captureWidth = targetRes.height * elementAspect;
-        }
-        
         const totalFrames = Math.ceil((durationMs / 1000) * fps);
         const frameInterval = durationMs / totalFrames;
         let isCapturing = true;
@@ -130,8 +152,8 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
           
           // Only capture if enough time has passed for next frame
           if (elapsed >= frameInterval) {
-            // Capture at exact target resolution to avoid scaling artifacts
-            const frame = await captureFrame(previewElement, Math.round(captureWidth), Math.round(captureHeight));
+            // Capture at maximum resolution for crystal clear quality
+            const frame = await captureFrame(previewElement);
             if (frame) {
               framesRef.current.push(frame);
             }
@@ -152,7 +174,7 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
 
         setExportPhase("finalizing");
         setProgress(88);
-        const finalFrame = await captureFrame(previewElement, Math.round(captureWidth), Math.round(captureHeight));
+        const finalFrame = await captureFrame(previewElement);
         if (finalFrame) {
           framesRef.current.push(finalFrame);
         }
@@ -300,7 +322,7 @@ async function createVideoFromFrames(
       try {
         const firstFrame = frames[0];
         
-        // Target resolutions
+        // Target resolutions - exact output dimensions
         const targetResolutions = {
           "720p": { width: 1280, height: 720 },
           "1080p": { width: 1920, height: 1080 },
@@ -309,17 +331,15 @@ async function createVideoFromFrames(
         
         const targetRes = targetResolutions[resolution];
         
-        // Frames are already captured at target resolution, just center them
-        const sourceAspect = firstFrame.width / firstFrame.height;
-        const targetAspect = targetRes.width / targetRes.height;
-        
-        // Create canvas at target resolution
+        // Create canvas at EXACT target resolution (no DPI scaling - causes stream issues)
         const canvas = document.createElement("canvas");
         canvas.width = targetRes.width;
         canvas.height = targetRes.height;
+        
         const ctx = canvas.getContext("2d", { 
           willReadFrequently: false,
-          alpha: false 
+          alpha: false,
+          desynchronized: false,  // Ensure synchronized rendering for quality
         });
         
         if (!ctx) {
@@ -327,39 +347,49 @@ async function createVideoFromFrames(
           return;
         }
         
-        // Disable image smoothing to prevent gradient artifacts - use nearest neighbor
-        // This prevents diagonal stripes from gradient interpolation
-        ctx.imageSmoothingEnabled = false;
+        // ULTIMATE QUALITY: Enable highest quality rendering at every step
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         
-        // Fill with black background
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Additional quality settings for text and graphics
+        (ctx as any).textRendering = 'optimizeLegibility';
+        (ctx as any).fontSmooth = 'always';
         
-        // Calculate centering (frames are already at correct size)
-        let offsetX = 0;
-        let offsetY = 0;
-        let drawWidth = firstFrame.width;
-        let drawHeight = firstFrame.height;
+        // Calculate aspect ratios for proper scaling
+        const sourceWidth = firstFrame.width;
+        const sourceHeight = firstFrame.height;
+        const sourceAspect = sourceWidth / sourceHeight;
+        const targetAspect = targetRes.width / targetRes.height;
+        
+        // Calculate draw dimensions to FILL the canvas while maintaining aspect ratio
+        let drawWidth: number, drawHeight: number, offsetX: number, offsetY: number;
         
         if (sourceAspect > targetAspect) {
-          // Source is wider - center vertically
-          offsetY = Math.round((targetRes.height - firstFrame.height) / 2);
+          // Source is wider than target - fit to width, center vertically
+          drawWidth = targetRes.width;
+          drawHeight = targetRes.width / sourceAspect;
+          offsetX = 0;
+          offsetY = Math.round((targetRes.height - drawHeight) / 2);
         } else {
-          // Source is taller - center horizontally
-          offsetX = Math.round((targetRes.width - firstFrame.width) / 2);
+          // Source is taller than target - fit to height, center horizontally
+          drawHeight = targetRes.height;
+          drawWidth = targetRes.height * sourceAspect;
+          offsetX = Math.round((targetRes.width - drawWidth) / 2);
+          offsetY = 0;
         }
 
         // Use captureStream with 0 to manually request frames
         const stream = canvas.captureStream(0);
         const videoTrack = stream.getVideoTracks()[0];
         
+        // Prioritize VP9 for superior quality at high bitrates
         const mimeTypes = [
+          "video/webm;codecs=vp9",  // Best quality - VP9
+          "video/webm;codecs=vp8",
+          "video/webm",
           "video/mp4;codecs=avc1.42E01E",
           "video/mp4;codecs=h264",
           "video/mp4",
-          "video/webm;codecs=h264",
-          "video/webm;codecs=vp9",
-          "video/webm"
         ];
         
         let selectedMimeType = "video/webm";
@@ -370,11 +400,12 @@ async function createVideoFromFrames(
           }
         }
         
-        // Higher bitrate for higher resolutions
+        // ABSOLUTE MAXIMUM BITRATES - No compression artifacts
+        // These are extremely high to ensure zero quality loss
         const bitrates = {
-          "720p": 8000000,   // 8 Mbps
-          "1080p": 16000000, // 16 Mbps
-          "4k": 50000000,    // 50 Mbps
+          "720p": 40000000,     // 40 Mbps - overkill for 720p = perfect quality
+          "1080p": 80000000,    // 80 Mbps - double Blu-ray = lossless appearance
+          "4k": 200000000,      // 200 Mbps - maximum possible for perfect 4K text
         };
         
         const mediaRecorder = new MediaRecorder(stream, {
@@ -395,30 +426,35 @@ async function createVideoFromFrames(
           resolve(blob);
         };
 
-        // Request data more frequently for smoother encoding
-        mediaRecorder.start(100);
+        // Request data very frequently for maximum quality encoding
+        mediaRecorder.start(16);  // ~60fps data chunks for smooth encoding
 
-        // Calculate the actual frame duration based on captured frames and target duration
-        // This ensures the video plays at the correct duration
-        // MediaRecorder timestamps frames based on when they're received, so we must
-        // feed frames at approximately real-time speed for correct video duration
+        // Calculate frame duration for correct video timing
         const frameDuration = durationMs / frames.length;
         
         for (let i = 0; i < frames.length; i++) {
-          // Clear and fill background
+          // Reset smoothing quality before each frame (some browsers reset it)
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          
+          // Clear canvas with black background
           ctx.fillStyle = "#000000";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          // Draw frame at exact size (no scaling) - this prevents gradient artifacts
-          ctx.drawImage(frames[i], offsetX, offsetY);
+          // Draw frame with maximum quality scaling
+          // The source frames are 6x supersampled, scaling down produces ultra-sharp output
+          ctx.drawImage(
+            frames[i],
+            0, 0, sourceWidth, sourceHeight,  // Source rectangle (full high-res frame)
+            offsetX, offsetY, drawWidth, drawHeight  // Destination rectangle (scaled to fit)
+          );
           
           // Request a new frame from the canvas stream
           if (videoTrack && 'requestFrame' in videoTrack) {
             (videoTrack as any).requestFrame();
           }
           
-          // Wait for the proper frame duration to get correct video timing
-          // This is necessary because MediaRecorder uses real-time timestamps
+          // Wait for proper frame duration for correct video timing
           await new Promise((r) => setTimeout(r, frameDuration));
           
           if (onProgress) {
@@ -426,8 +462,8 @@ async function createVideoFromFrames(
           }
         }
 
-        // Brief pause to ensure last frames are encoded
-        await new Promise((r) => setTimeout(r, 100));
+        // Brief pause to ensure last frames are fully encoded
+        await new Promise((r) => setTimeout(r, 150));
         
         mediaRecorder.stop();
       } catch (error) {
