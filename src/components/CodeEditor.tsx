@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Download, Loader2, Play, Film, ImageIcon, Circle } from "lucide-react";
 import PhoneMockup from "@/components/PhoneMockup";
@@ -33,10 +34,11 @@ const themes = [
   { value: "neon", label: "Neon" },
 ];
 
-const durations = [
-  { value: "long", label: "Long (8s)", targetMs: 8000 },
-  { value: "medium", label: "Medium (4s)", targetMs: 4000 },
-  { value: "short", label: "Short (1.5s)", targetMs: 1500 },
+const typingSpeedPresets = [
+  { value: "fast", label: "Fast (10ms)", delayMs: 10 },
+  { value: "medium", label: "Medium (40ms)", delayMs: 40 },
+  { value: "slow", label: "Slow (100ms)", delayMs: 100 },
+  { value: "custom", label: "Custom", delayMs: 40 },
 ];
 
 const aspectRatios = [
@@ -87,7 +89,8 @@ const CodeEditor = () => {
 console.log(greet("Developer"));`);
   const [language, setLanguage] = useState("auto");
   const [theme, setTheme] = useState("cyberpunk");
-  const [duration, setDuration] = useState("medium");
+  const [typingSpeed, setTypingSpeed] = useState("medium");
+  const [customTypingSpeed, setCustomTypingSpeed] = useState("40");
   const [exportFormat, setExportFormat] = useState<ExportFormat>("mp4");
   const [exportResolution, setExportResolution] = useState<ExportResolution>("1080p");
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("portrait");
@@ -119,31 +122,31 @@ console.log(greet("Developer"));`);
   const previewRef = useRef<CodePreviewHandle>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({ 
-    fps: 30,
-    resolution: exportResolution 
-  });
 
-  // Get target duration from selected duration setting
-  const targetDuration = useMemo(() => 
-    durations.find(d => d.value === duration)?.targetMs || 4000, 
-    [duration]
-  );
-  
-  // Calculate typing delay to fit animation within target duration
-  // Formula: typingDelay = (targetDuration - breakpointPauses - endBuffer) / code.length
+  // Get typing delay from selected typing speed setting
   const typingDelay = useMemo(() => {
+    if (typingSpeed === "custom") {
+      const customDelay = parseFloat(customTypingSpeed);
+      if (isNaN(customDelay) || customDelay < 1) return 40; // Default to 40ms if invalid
+      return Math.max(1, Math.min(500, customDelay)); // Clamp between 1ms and 500ms
+    }
+    const preset = typingSpeedPresets.find(p => p.value === typingSpeed);
+    return preset?.delayMs || 40;
+  }, [typingSpeed, customTypingSpeed]);
+
+  const { exportVideo, exportGif, isExporting, progress } = useVideoExport({
+    fps: 30,
+    resolution: exportResolution,
+    typingDelay: typingDelay
+  });
+  
+  // Calculate actual animation duration based on typing speed
+  const actualAnimationDuration = useMemo(() => {
     const endBuffer = 500; // End delay in CodePreview
     const breakpointPauseDuration = pausedLineIndices.length * pauseDuration;
-    const availableTimeForTyping = targetDuration - breakpointPauseDuration - endBuffer;
-    
-    // Ensure minimum delay of 5ms and maximum of 200ms per character
-    const calculatedDelay = Math.max(5, Math.min(200, availableTimeForTyping / Math.max(1, code.length)));
-    return calculatedDelay;
-  }, [targetDuration, pausedLineIndices.length, pauseDuration, code.length]);
-  
-  // The actual animation duration is now the target duration
-  const actualAnimationDuration = targetDuration;
+    const typingTime = code.length * typingDelay;
+    return typingTime + breakpointPauseDuration + endBuffer;
+  }, [code.length, typingDelay, pausedLineIndices.length, pauseDuration]);
 
   const handlePreview = async () => {
     if (previewRef.current) {
@@ -342,20 +345,38 @@ console.log(greet("Developer"));`);
 
                     <div>
                       <label className="text-base lg:text-lg font-medium text-foreground mb-2 block">
-                        Duration
+                        Typing Speed
                       </label>
-                      <Select value={duration} onValueChange={setDuration} disabled={isAnimating || isExporting}>
+                      <Select value={typingSpeed} onValueChange={setTypingSpeed} disabled={isAnimating || isExporting}>
                         <SelectTrigger className="bg-secondary border-border/50">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {durations.map((d) => (
-                            <SelectItem key={d.value} value={d.value}>
-                              {d.label}
+                          {typingSpeedPresets.map((preset) => (
+                            <SelectItem key={preset.value} value={preset.value}>
+                              {preset.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {typingSpeed === "custom" && (
+                        <div className="mt-2">
+                          <Input
+                            type="number"
+                            min="1"
+                            max="500"
+                            step="1"
+                            value={customTypingSpeed}
+                            onChange={(e) => setCustomTypingSpeed(e.target.value)}
+                            placeholder="Enter delay in ms"
+                            disabled={isAnimating || isExporting}
+                            className="bg-secondary border-border/50"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Delay per character (1-500ms)
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div>

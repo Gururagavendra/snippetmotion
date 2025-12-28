@@ -31,6 +31,9 @@ Create beautiful, shareable animated code videos or gifs in seconds. Perfect for
 
 ### Installation
 
+
+![SnippetMotion Demo](snippet-motion-1766907321348.gif)
+
 ```bash
 # Clone the repository
 git clone <GIT_URL>

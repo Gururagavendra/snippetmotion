@@ -3,14 +3,43 @@ import html2canvas from "html2canvas";
 import { toast } from "sonner";
 import GIF from "gif.js";
 
+// Utility function to properly dispose of canvas elements and free memory
+const disposeCanvas = (canvas: HTMLCanvasElement | null) => {
+  if (!canvas) return;
+
+  try {
+    // Clear the canvas content
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Set dimensions to 0 to release GPU memory and canvas context
+    canvas.width = 0;
+    canvas.height = 0;
+
+    // Remove any event listeners (if any)
+    canvas.removeAttribute('width');
+    canvas.removeAttribute('height');
+  } catch (error) {
+    console.warn('Error disposing canvas:', error);
+  }
+};
+
+// Utility function to dispose of all canvases in an array
+const disposeCanvasArray = (canvases: HTMLCanvasElement[]) => {
+  canvases.forEach(canvas => disposeCanvas(canvas));
+};
+
 interface UseVideoExportOptions {
   fps?: number;
   quality?: number;
   resolution?: "720p" | "1080p" | "4k";
+  typingDelay?: number;
 }
 
 export const useVideoExport = (options: UseVideoExportOptions = {}) => {
-  const { fps = 30, quality = 1.0, resolution = "1080p" } = options;
+  const { fps = 30, quality = 1.0, resolution = "1080p", typingDelay = 40 } = options;
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [exportPhase, setExportPhase] = useState<string>("");
@@ -82,9 +111,18 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
             allElements.forEach((el) => {
               const htmlEl = el as HTMLElement;
               htmlEl.style.textRendering = 'geometricPrecision';
-              
-              // CRITICAL: Ensure background gradients render at maximum quality
+
+              // CRITICAL: Preserve line-height for consistent text rendering during typing animation
+              // This fixes the "half height" text issue in exported videos/GIFs
               const computedStyle = window.getComputedStyle(htmlEl);
+              if (computedStyle.lineHeight && computedStyle.lineHeight !== 'normal') {
+                htmlEl.style.lineHeight = computedStyle.lineHeight;
+              } else {
+                // Force consistent line height for code text (equivalent to leading-relaxed)
+                htmlEl.style.lineHeight = '1.625';
+              }
+
+              // CRITICAL: Ensure background gradients render at maximum quality
               if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
                 // Force high-quality gradient rendering
                 htmlEl.style.imageRendering = 'auto';
@@ -96,7 +134,7 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
                 htmlEl.style.transform = 'translateZ(0)';
                 htmlEl.style.willChange = 'background-image';
               }
-              
+
               // Also check inline styles
               if (htmlEl.style.background || htmlEl.style.backgroundImage) {
                 htmlEl.style.imageRendering = 'auto';
@@ -104,6 +142,17 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
                 htmlEl.style.backgroundRepeat = 'no-repeat';
                 htmlEl.style.transform = 'translateZ(0)';
               }
+            });
+
+            // Additional fix: Force line-height on the main container and pre/code elements
+            const preElements = clonedElement.querySelectorAll('pre, code, .hljs');
+            preElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              // Ensure consistent line height for all text elements
+              htmlEl.style.lineHeight = '1.625'; // Equivalent to leading-relaxed
+              htmlEl.style.textRendering = 'geometricPrecision';
+              (htmlEl.style as any).webkitFontSmoothing = 'antialiased';
+              (htmlEl.style as any).MozOsxFontSmoothing = 'grayscale';
             });
             
             // Force repaint to ensure gradients render at full quality
@@ -152,6 +201,9 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
           
           // Only capture if enough time has passed for next frame
           if (elapsed >= frameInterval) {
+            // Small delay to ensure DOM updates are complete (fixes line-height issues)
+            await new Promise(resolve => setTimeout(resolve, 16)); // ~1 frame at 60fps
+
             // Capture at maximum resolution for crystal clear quality
             const frame = await captureFrame(previewElement);
             if (frame) {
@@ -188,7 +240,7 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         });
 
         setProgress(100);
-        
+
         const url = URL.createObjectURL(videoBlob);
         const a = document.createElement("a");
         a.href = url;
@@ -199,6 +251,9 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         URL.revokeObjectURL(url);
 
         toast.success("Video exported successfully!");
+
+        // Dispose of all captured frames to free memory
+        disposeCanvasArray(framesRef.current);
       } catch (error) {
         console.error("Export error:", error);
         toast.error("Failed to export video. Please try again.");
@@ -206,6 +261,8 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         setIsExporting(false);
         setProgress(0);
         setExportPhase("");
+        // Dispose of any remaining canvases and clear the array reference
+        disposeCanvasArray(framesRef.current);
         framesRef.current = [];
       }
     },
@@ -224,10 +281,9 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
       framesRef.current = [];
 
       try {
-        // Lower FPS for GIF (15fps for smaller file size, still smooth)
-        const gifFps = 15;
-        const totalFrames = Math.ceil((durationMs / 1000) * gifFps);
-        const frameInterval = durationMs / totalFrames;
+        // Use typingDelay as the frame interval to match character-by-character animation
+        const frameInterval = typingDelay;
+        const totalFrames = Math.ceil(durationMs / frameInterval);
         let isCapturing = true;
         let lastCaptureTime = performance.now();
         const captureStartTime = performance.now();
@@ -277,8 +333,12 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         setExportPhase("rendering");
         setProgress(75);
 
+        // Use the typingDelay as the frame delay - this matches the actual animation timing
+        // Convert to centiseconds (GIF delay is in 1/100th of a second)
+        const gifFrameDelay = Math.max(1, Math.round(typingDelay / 10));
+
         // GIF rendering takes longer, give it 25% of progress
-        const gifBlob = await createGifFromFrames(framesRef.current, gifFps, (renderProgress) => {
+        const gifBlob = await createGifFromFrames(framesRef.current, gifFrameDelay, (renderProgress) => {
           setProgress(75 + (renderProgress * 25));
         });
 
@@ -294,6 +354,9 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         URL.revokeObjectURL(url);
 
         toast.success("GIF exported successfully!");
+
+        // Dispose of all captured frames to free memory
+        disposeCanvasArray(framesRef.current);
       } catch (error) {
         console.error("GIF export error:", error);
         toast.error("Failed to export GIF. Please try again.");
@@ -301,10 +364,12 @@ export const useVideoExport = (options: UseVideoExportOptions = {}) => {
         setIsExporting(false);
         setProgress(0);
         setExportPhase("");
+        // Dispose of any remaining canvases and clear the array reference
+        disposeCanvasArray(framesRef.current);
         framesRef.current = [];
       }
     },
-    [captureFrame]
+    [captureFrame, typingDelay]
   );
 
   return { exportVideo, exportGif, isExporting, progress, exportPhase };
@@ -318,21 +383,24 @@ async function createVideoFromFrames(
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
+    // Declare canvas outside try block so it's accessible in catch block for cleanup
+    let canvas: HTMLCanvasElement | null = null;
+
     (async () => {
       try {
         const firstFrame = frames[0];
-        
+
         // Target resolutions - exact output dimensions
         const targetResolutions = {
           "720p": { width: 1280, height: 720 },
           "1080p": { width: 1920, height: 1080 },
           "4k": { width: 3840, height: 2160 },
         };
-        
+
         const targetRes = targetResolutions[resolution];
-        
+
         // Create canvas at EXACT target resolution (no DPI scaling - causes stream issues)
-        const canvas = document.createElement("canvas");
+        canvas = document.createElement("canvas");
         canvas.width = targetRes.width;
         canvas.height = targetRes.height;
         
@@ -423,6 +491,10 @@ async function createVideoFromFrames(
         mediaRecorder.onstop = () => {
           const isMP4 = selectedMimeType.includes("mp4");
           const blob = new Blob(chunks, { type: isMP4 ? "video/mp4" : "video/webm" });
+
+          // Dispose of the rendering canvas to free memory
+          disposeCanvas(canvas);
+
           resolve(blob);
         };
 
@@ -467,6 +539,8 @@ async function createVideoFromFrames(
         
         mediaRecorder.stop();
       } catch (error) {
+        // Dispose of canvas on error to prevent memory leaks
+        disposeCanvas(canvas);
         reject(error);
       }
     })();
@@ -475,7 +549,7 @@ async function createVideoFromFrames(
 
 async function createGifFromFrames(
   frames: HTMLCanvasElement[],
-  fps: number,
+  frameDelayCentiseconds: number,
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -490,7 +564,9 @@ async function createGifFromFrames(
         workerScript: '/gif.worker.js',
       });
 
-      const delay = 1000 / fps;
+      // Use the provided frame delay directly (already in centiseconds)
+      // GIF delay is in 1/100th of a second (centiseconds)
+      const delay = Math.max(1, frameDelayCentiseconds);
 
       frames.forEach((frame, index) => {
         gif.addFrame(frame, { delay, copy: true });
@@ -506,11 +582,15 @@ async function createGifFromFrames(
       });
 
       gif.on('finished', (blob: Blob) => {
+        // Dispose of all frame canvases after GIF creation to free memory
+        disposeCanvasArray(frames);
         resolve(blob);
       });
 
       gif.render();
     } catch (error) {
+      // Dispose of frames on error to prevent memory leaks
+      disposeCanvasArray(frames);
       reject(error);
     }
   });
